@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEPE KUN | My Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Outfit', 'sans-serif'] }, colors: { brand: { 900: '#1a1a1a' } } } } }
+    </script>
+    <style>
+        body {
+            background-color: #fff3ff;
+            background-image: url('pepekun-original-bg.png');
+            background-repeat: repeat;
+            background-size: 300px;
+            background-attachment: fixed;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                background-size: 500px;
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-float {
+            animation: float 5s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body class="text-brand-900 antialiased selection:bg-pink-200">
+
+    <!-- Navbar -->
+    <nav
+        class="sticky top-4 z-50 w-[95%] max-w-6xl mx-auto bg-white/60 backdrop-blur-md border border-white/50 px-6 py-4 shadow-md rounded-full flex justify-between items-center">
+        <a href="index.html" class="text-sm font-medium hover:text-pink-500 transition-colors">← Back to Shop</a>
+        <span class="text-xl font-bold tracking-wide">My Account</span>
+        <button id="logout-btn" class="text-sm font-medium text-red-500 hover:text-red-700 transition-colors">Log
+            Out</button>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Left Column: Profile Details -->
+        <div
+            class="md:col-span-1 bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-xl border border-white animate-float h-fit">
+            <h2 class="text-2xl font-semibold mb-6">Shipping Details</h2>
+            <form id="profile-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-500 mb-1">Full Name</label>
+                    <input type="text" id="prof-name"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white text-sm"
+                        placeholder="Your Full Name" required>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 mb-1">Phone Number</label>
+                    <input type="tel" id="prof-phone"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white text-sm"
+                        placeholder="Phone Number">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 mb-1">Delivery Address</label>
+                    <textarea id="prof-address" rows="4"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white text-sm"
+                        placeholder="Full street address..." required></textarea>
+                </div>
+                <button type="submit" id="save-btn"
+                    class="w-full py-3 bg-brand-900 text-white rounded-full font-medium hover:bg-pink-500 transition-colors shadow-md mt-4">
+                    Save Details
+                </button>
+            </form>
+        </div>
+
+        <!-- Right Column: Order History -->
+        <div
+            class="md:col-span-2 bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-xl border border-white animate-float delay-100">
+            <h2 class="text-2xl font-semibold mb-6">Past Orders</h2>
+            <div id="orders-container" class="space-y-4">
+                <p id="orders-loading" class="text-gray-500 text-sm bg-white p-4 rounded-xl border border-gray-100">
+                    Loading your order history...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- SUPABASE ACCOUNT LOGIC MODULE -->
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUser = null;
+
+        async function initAccount() {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = user;
+
+            await Promise.all([
+                loadProfile(),
+                loadOrders()
+            ]);
+        }
+
+        async function loadProfile() {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Error fetching profile:', error);
+                return;
+            }
+
+            if (data) {
+                document.getElementById('prof-name').value = data.full_name || '';
+                document.getElementById('prof-phone').value = data.phone || '';
+                document.getElementById('prof-address').value = data.address || '';
+            }
+        }
+
+        async function saveProfile(e) {
+            e.preventDefault();
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.innerText = "Saving...";
+            saveBtn.disabled = true;
+
+            const full_name = document.getElementById('prof-name').value.trim();
+            const phone = document.getElementById('prof-phone').value.trim();
+            const address = document.getElementById('prof-address').value.trim();
+
+            const { error } = await supabase
+                .from('profiles')
+                .upsert(
+                    {
+                        id: currentUser.id,
+                        full_name,
+                        phone,
+                        address,
+                        updated_at: new Date().toISOString()
+                    },
+                    { onConflict: 'id' }
+                );
+
+            saveBtn.disabled = false;
+
+            if (error) {
+                console.error('Error saving profile:', error);
+                alert('Failed to save details. Please try again.');
+                saveBtn.innerText = "Save Details";
+                return;
+            }
+
+            saveBtn.innerText = "Saved Successfully!";
+            saveBtn.classList.replace('bg-brand-900', 'bg-pink-500');
+
+            setTimeout(() => {
+                saveBtn.innerText = "Save Details";
+                saveBtn.classList.replace('bg-pink-500', 'bg-brand-900');
+            }, 2000);
+        }
+
+        async function loadOrders() {
+            const container = document.getElementById('orders-container');
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading orders:', error);
+                container.innerHTML = `<p class="text-red-500 text-sm bg-white p-4 rounded-xl border border-red-100">Could not load orders.</p>`;
+                return;
+            }
+
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-sm bg-white p-4 rounded-xl border border-gray-100">You haven't placed any orders yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = orders.map(order => renderOrderCard(order)).join('');
+        }
+
+        function renderOrderCard(order) {
+            const formattedDate = new Date(order.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            let items = [];
+            if (typeof order.items === 'string') {
+                try { items = JSON.parse(order.items); } catch { items = []; }
+            } else if (Array.isArray(order.items)) {
+                items = order.items;
+            }
+
+            const statusClass = getStatusBadgeClass(order.status);
+
+            return `
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between border-b border-gray-100 pb-3 gap-2">
+                        <div>
+                            <span class="text-xs text-gray-400 block">ORDER ID</span>
+                            <span class="font-bold text-gray-900 text-sm">#${order.id.slice(0, 8)}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-400 block">DATE</span>
+                            <span class="text-sm font-medium text-gray-600">${formattedDate}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-400 block mb-1">STATUS</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${statusClass}">
+                                ${order.status || 'Pending'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="divide-y divide-gray-50">
+                        ${items.map(item => `
+                            <div class="py-2 flex items-center justify-between text-sm">
+    <div class="flex items-center gap-3">
+        ${item.image ? `<img src="${item.image}" class="w-10 h-10 object-cover rounded-lg border border-gray-100">` : ''}
+        <div>
+            <p class="font-medium text-gray-800">${item.title || 'Product'}</p>
+            ${item.selected_color ? `<p class="text-xs text-gray-500 font-medium mt-0.5">Color: <span class="text-pink-600 font-semibold">${item.selected_color}</span></p>` : ''}
+            <p class="text-xs text-gray-400">Qty: ${item.quantity || 1}</p>
+        </div>
+    </div>
+    <span class="font-semibold text-gray-900">
+        ₹${(parseFloat(item.price || 0) * parseInt(item.quantity || 1)).toFixed(2)}
+    </span>
+</div>
+                        `).join('')}
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-3 flex justify-between items-center text-base font-bold text-gray-900">
+                        <span>Total Paid</span>
+                        <span class="text-pink-500">₹${parseFloat(order.total_amount || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusBadgeClass(status) {
+            const s = (status || '').toLowerCase();
+            if (s === 'delivered') return 'bg-green-100 text-green-700';
+            if (s === 'shipped') return 'bg-blue-100 text-blue-700';
+            if (s === 'processing') return 'bg-purple-100 text-purple-700';
+            if (s === 'cancelled') return 'bg-red-100 text-red-700';
+            return 'bg-yellow-100 text-yellow-700';
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', saveProfile);
+        document.getElementById('logout-btn').addEventListener('click', logout);
+        document.addEventListener('DOMContentLoaded', initAccount);
+    </script>
+</body>
+
+</html>

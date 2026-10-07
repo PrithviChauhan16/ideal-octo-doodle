@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | PEPE KUN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SUPABASE JS CLIENT CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        if (window.tailwind) {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                        colors: { brand: { 50: '#fdfbf7', 900: '#1a1a1a' } },
+                        keyframes: {
+                            fadeIn: {
+                                '0%': { opacity: '0', transform: 'scale(0.95)' },
+                                '100%': { opacity: '1', transform: 'scale(1)' }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-brand-900 antialiased font-sans flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 z-20 shadow-sm">
+        <div class="h-20 flex items-center px-8 border-b border-gray-100">
+            <span class="text-xl font-bold tracking-widest uppercase">PEPE KUN <span
+                    class="text-pink-500 text-sm">ADMIN</span></span>
+        </div>
+
+        <nav class="flex-grow py-6 flex flex-col gap-2 px-4">
+            <button onclick="switchTab('orders')" id="nav-orders"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl font-medium text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors bg-pink-50 text-pink-600">
+                📦 Orders
+            </button>
+            <button onclick="switchTab('products')" id="nav-products"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl font-medium text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                🧸 Products
+            </button>
+            <button onclick="switchTab('categories')" id="nav-categories"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl font-medium text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                🏷️ Categories
+            </button>
+            <button onclick="switchTab('inquiries')" id="nav-inquiries"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl font-medium text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                ✉️ Inquiries
+            </button>
+        </nav>
+
+        <!-- SIDEBAR FOOTER (EXIT & LOGOUT) -->
+        <div class="p-4 border-t border-gray-100 space-y-2">
+            <a href="index.html"
+                class="flex items-center justify-center w-full py-2 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg transition-colors">
+                Exit to Store
+            </a>
+            <button onclick="handleLogout()"
+                class="flex items-center justify-center w-full py-2 text-sm text-red-600 hover:bg-red-50 border border-red-100 rounded-lg transition-colors font-medium">
+                🚪 Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow overflow-y-auto bg-gray-50 relative">
+        <div class="p-8 max-w-7xl mx-auto">
+
+            <!-- ORDERS TAB -->
+            <section id="tab-orders" class="tab-content block">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-semibold">Customer Orders</h1>
+                    <button onclick="fetchOrders()"
+                        class="text-xs bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+                        🔄 Refresh Orders
+                    </button>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr
+                                    class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+                                    <th class="p-4 font-medium">Date / Order ID</th>
+                                    <th class="p-4 font-medium">Customer Details</th>
+                                    <th class="p-4 font-medium">Payment / UTR</th>
+                                    <th class="p-4 font-medium">Total</th>
+                                    <th class="p-4 font-medium">Status</th>
+                                    <th class="p-4 font-medium">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-list" class="text-sm divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="6" class="p-8 text-center text-gray-500">Loading orders...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PRODUCTS TAB -->
+            <section id="tab-products" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-semibold">Manage Products</h1>
+                    <button onclick="openAddProduct()"
+                        class="bg-brand-900 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm">
+                        + Add New Product
+                    </button>
+                </div>
+
+                <div id="product-form-container"
+                    class="hidden bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm mb-8 transition-all">
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                        <h2 id="form-title" class="text-xl font-medium">Add New Product</h2>
+                        <button onclick="closeProductForm()"
+                            class="text-gray-400 hover:text-gray-900 text-xl font-bold">&times;</button>
+                    </div>
+                    <form id="product-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Product Title</label>
+                                <input type="text" id="prod-title" placeholder="Product Title"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Price (₹)</label>
+                                <input type="number" id="prod-price" placeholder="0.00" step="0.01"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400 text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Available Colors <span class="text-xs text-gray-400 font-normal">(Comma-separated, e.g. Pink, Olive Green, White, Blue)</span></label>
+                                <input type="text" id="prod-colors" placeholder="e.g. Pink, Olive Green, White"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400 text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Categories <span class="text-xs text-gray-400 font-normal">(tick one or more)</span></label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Main categories</p>
+                                        <div id="prod-category-main" class="space-y-2 text-sm text-gray-700"></div>
+                                    </div>
+                                    <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Sub categories (e.g. Special for Her, Best for Kids)</p>
+                                        <div id="prod-category-sub" class="space-y-2 text-sm text-gray-700"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 PRODUCT IMAGES INPUT SECTION -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Images (Upload up to 4 images)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div>
+                                    <span class="text-xs text-gray-500 mb-1 block">Main Image *</span>
+                                    <input type="file" id="prod-img-1" accept="image/*"
+                                        class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100">
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500 mb-1 block">Image 2</span>
+                                    <input type="file" id="prod-img-2" accept="image/*"
+                                        class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100">
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500 mb-1 block">Image 3</span>
+                                    <input type="file" id="prod-img-3" accept="image/*"
+                                        class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100">
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500 mb-1 block">Image 4</span>
+                                    <input type="file" id="prod-img-4" accept="image/*"
+                                        class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea id="prod-desc" rows="3" placeholder="Enter product description..."
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400 text-sm"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Specifications (One per line)</label>
+                            <textarea id="prod-specs" rows="3" placeholder="Specifications"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400 text-sm"></textarea>
+                        </div>
+
+                        <div class="flex justify-end gap-4 pt-4">
+                            <button type="button" onclick="closeProductForm()"
+                                class="px-6 py-2 rounded-full border border-gray-200 text-sm font-medium hover:bg-gray-50">Cancel</button>
+                            <button type="button" id="submit-btn" onclick="saveProduct()"
+                                class="bg-pink-500 text-white px-8 py-2 rounded-full text-sm font-medium hover:bg-pink-600 shadow-sm">
+                                Save Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div
+                        class="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-200 rounded-2xl">
+                        No products added yet. Click "+ Add New Product" to get started.
+                    </div>
+                </div>
+            </section>
+
+            <!-- CATEGORIES TAB -->
+            <section id="tab-categories" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-semibold">Categories</h1>
+                    <button onclick="addNewCategory()"
+                        class="bg-brand-900 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm">
+                        + New Category
+                    </button>
+                </div>
+
+                <div id="categories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div id="empty-categories-state"
+                        class="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-200 rounded-2xl">
+                        No categories created yet. Click "+ New Category" to add one.
+                    </div>
+                </div>
+            </section>
+
+            <!-- INQUIRIES TAB -->
+            <section id="tab-inquiries" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-semibold">Customer Inquiries</h1>
+                    <button onclick="fetchInquiries()"
+                        class="text-xs bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+                        🔄 Refresh Inquiries
+                    </button>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr
+                                class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+                                <th class="p-4 font-medium">Date</th>
+                                <th class="p-4 font-medium">Name</th>
+                                <th class="p-4 font-medium">Email</th>
+                                <th class="p-4 font-medium">Message Preview</th>
+                                <th class="p-4 font-medium">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inquiries-list" class="text-sm divide-y divide-gray-100">
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-gray-500">Loading inquiries...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ORDER DETAILS MODAL -->
+    <div id="order-modal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-xl w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="text-xl font-bold text-gray-900">Order Details</h3>
+                <button onclick="closeOrderModal()"
+                    class="text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
+            </div>
+
+            <div id="modal-content" class="space-y-4 text-sm text-gray-600">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- INQUIRY MESSAGE MODAL -->
+    <div id="inquiry-modal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="text-xl font-bold text-gray-900">Customer Message</h3>
+                <button onclick="closeInquiryModal()"
+                    class="text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
+            </div>
+
+            <div id="inquiry-modal-content" class="space-y-4 text-sm text-gray-600">
+                <!-- Populated dynamically -->
+            </div>
+
+            <div class="pt-4 border-t flex justify-between items-center">
+                <a id="inquiry-reply-btn" href="#"
+                    class="px-5 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-full font-medium text-xs transition-colors">
+                    ✉️ Reply via Email
+                </a>
+                <button onclick="closeInquiryModal()"
+                    class="px-6 py-2 bg-gray-900 text-white rounded-full font-medium text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMPORT SUPABASE CLIENT AND RUN INITIALIZATION -->
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // Expose client globally so inline onclick handlers can access it
+        window.supabaseClient = supabase;
+
+        // Trigger initial data loading once DOM is ready
+        window.addEventListener('DOMContentLoaded', async () => {
+            await checkAuthGuard();
+            fetchOrders();
+            fetchCategories();
+            populateCategoryDropdown();
+            fetchProducts();
+            fetchInquiries();
+        });
+    </script>
+
+    <script>
+        let cachedOrders = [];
+        let cachedInquiries = [];
+
+        async function checkAuthGuard() {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const { data: { session } } = await client.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function handleLogout() {
+            const client = window.supabaseClient;
+            if (client) {
+                await client.auth.signOut();
+            }
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-pink-50', 'text-pink-600');
+                el.classList.add('text-gray-500');
+            });
+
+            const activeSection = document.getElementById('tab-' + tabId);
+            if (activeSection) {
+                activeSection.classList.remove('hidden');
+                activeSection.classList.add('block');
+            }
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-500');
+                activeBtn.classList.add('bg-pink-50', 'text-pink-600');
+            }
+        }
+
+        // ==================== FETCH & MANAGE ORDERS ====================
+        async function fetchOrders() {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const tbody = document.getElementById('orders-list');
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Loading orders...</td></tr>`;
+
+            const { data: orders, error } = await client
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching orders:', error.message);
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load orders: ${error.message}</td></tr>`;
+                return;
+            }
+
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">No orders found.</td></tr>`;
+                return;
+            }
+
+            cachedOrders = orders;
+            tbody.innerHTML = '';
+
+            orders.forEach(order => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+
+                const orderDate = new Date(order.created_at).toLocaleDateString('en-IN', {
+                    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                const statusColor = getStatusColorClass(order.status);
+
+                tr.innerHTML = `
+                    <td class="p-4 font-mono text-xs text-gray-600">
+                        <div class="font-bold text-gray-900">#${order.id.slice(0, 8)}</div>
+                        <div class="text-[11px] text-gray-400">${orderDate}</div>
+                    </td>
+                    <td class="p-4">
+                        <div class="font-medium text-gray-900">${order.customer_name || 'N/A'}</div>
+                        <div class="text-xs text-gray-500">${order.customer_email || ''}</div>
+                        <div class="text-xs text-gray-400">${order.phone || ''}</div>
+                    </td>
+                    <td class="p-4 font-mono text-xs">
+                        <span class="bg-gray-100 text-gray-800 px-2.5 py-1 rounded-md font-semibold border border-gray-200">
+                            ${order.transaction_id || 'N/A'}
+                        </span>
+                    </td>
+                    <td class="p-4 font-bold text-gray-900">
+                        ₹${parseFloat(order.total_amount || 0).toFixed(2)}
+                    </td>
+                    <td class="p-4">
+                        <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-200 cursor-pointer ${statusColor} focus:outline-none">
+                            <option value="Pending Verification" ${order.status === 'Pending Verification' ? 'selected' : ''}>Pending Verification</option>
+                            <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                    <td class="p-4">
+                        <button onclick="viewOrderDetails('${order.id}')" class="text-xs font-medium text-pink-600 hover:text-pink-800 underline">
+                            View / Edit
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getStatusColorClass(status) {
+            switch (status) {
+                case 'Pending Verification': return 'bg-amber-50 text-amber-700 border-amber-200';
+                case 'Processing': return 'bg-blue-50 text-blue-700 border-blue-200';
+                case 'Shipped': return 'bg-purple-50 text-purple-700 border-purple-200';
+                case 'Delivered': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                case 'Cancelled': return 'bg-red-50 text-red-700 border-red-200';
+                default: return 'bg-gray-50 text-gray-700 border-gray-200';
+            }
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const { data: updatedData, error } = await client
+                .from('orders')
+                .update({ status: newStatus })
+                .eq('id', orderId)
+                .select();
+
+            if (error) {
+                alert('Failed to update status: ' + error.message);
+                fetchOrders();
+            } else {
+                if (updatedData && updatedData.length > 0) {
+                    const idx = cachedOrders.findIndex(o => o.id === orderId);
+                    if (idx !== -1) cachedOrders[idx] = updatedData[0];
+                }
+                fetchOrders();
+            }
+        }
+
+        function viewOrderDetails(orderId) {
+            const order = cachedOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const modalContent = document.getElementById('modal-content');
+
+            const items = Array.isArray(order.items) ? order.items : [];
+            const itemsListHtml = items.map(i => {
+                const itemColor = i.selected_color || i.color || '';
+                return `
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        ${i.image ? `<img src="${i.image}" class="w-10 h-10 object-cover rounded-lg">` : ''}
+                        <div>
+                            <p class="font-medium text-gray-900 text-xs">
+                                ${i.title || 'Product'} 
+                                ${itemColor ? `<span class="ml-1 text-[10px] bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded-full font-medium">Color: ${itemColor}</span>` : ''}
+                            </p>
+                            <p class="text-[11px] text-gray-400">Qty: ${i.quantity || 1}</p>
+                        </div>
+                    </div>
+                    <span class="font-semibold text-gray-900 text-xs">₹${(parseFloat(i.price || 0) * parseInt(i.quantity || 1)).toFixed(2)}</span>
+                </div>
+            `;
+            }).join('');
+
+            modalContent.innerHTML = `
+                <form id="edit-order-form" onsubmit="event.preventDefault(); saveOrderDetails('${order.id}');" class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-2xl space-y-3 border border-gray-100">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Customer Name</label>
+                                <input type="text" id="edit-order-name" value="${order.customer_name || ''}" class="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Email</label>
+                                <input type="email" id="edit-order-email" value="${order.customer_email || ''}" class="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Phone</label>
+                                <input type="text" id="edit-order-phone" value="${order.phone || ''}" class="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Order Status</label>
+                                <select id="edit-order-status" class="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold focus:outline-none focus:border-pink-400">
+                                    <option value="Pending Verification" ${order.status === 'Pending Verification' ? 'selected' : ''}>Pending Verification</option>
+                                    <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                                    <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                    <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                    <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Shipping Address</label>
+                            <textarea id="edit-order-address" rows="2" class="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-xs focus:outline-none focus:border-pink-400">${order.shipping_address || ''}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="bg-pink-50/60 p-4 rounded-2xl border border-pink-100 space-y-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-pink-900 mb-1">UPI Reference / UTR</label>
+                            <input type="text" id="edit-order-utr" value="${order.transaction_id || ''}" class="w-full px-3 py-1.5 rounded-lg border border-pink-200 font-mono text-xs font-bold text-pink-700 focus:outline-none focus:border-pink-400 bg-white">
+                        </div>
+                        <div><strong class="text-pink-900 text-xs">Total Paid:</strong> <span class="font-bold text-pink-700 text-xs">₹${parseFloat(order.total_amount || 0).toFixed(2)}</span></div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-2 text-xs">Items Ordered (${items.length})</h4>
+                        <div class="max-h-40 overflow-y-auto pr-1 space-y-1 border border-gray-100 rounded-xl p-2 bg-white">
+                            ${itemsListHtml || '<p class="text-xs text-gray-400">No items available.</p>'}
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex justify-end gap-3 border-t">
+                        <button type="button" onclick="closeOrderModal()" class="px-5 py-2 border border-gray-200 text-gray-700 rounded-full font-medium text-xs hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button type="submit" id="save-order-btn" class="px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-full font-medium text-xs transition-colors shadow-sm">Save Order Changes</button>
+                    </div>
+                </form>
+            `;
+
+            document.getElementById('order-modal').classList.remove('hidden');
+        }
+
+        async function saveOrderDetails(orderId) {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const name = document.getElementById('edit-order-name').value.trim();
+            const email = document.getElementById('edit-order-email').value.trim();
+            const phone = document.getElementById('edit-order-phone').value.trim();
+            const status = document.getElementById('edit-order-status').value;
+            const shipping_address = document.getElementById('edit-order-address').value.trim();
+            const transaction_id = document.getElementById('edit-order-utr').value.trim();
+
+            const saveBtn = document.getElementById('save-order-btn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerText = 'Updating Order...';
+            }
+
+            const { data: updatedData, error } = await client
+                .from('orders')
+                .update({
+                    customer_name: name,
+                    customer_email: email,
+                    phone: phone,
+                    status: status,
+                    shipping_address: shipping_address,
+                    transaction_id: transaction_id
+                })
+                .eq('id', orderId)
+                .select();
+
+            if (error) {
+                alert('Failed to update order: ' + error.message);
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = 'Save Order Changes';
+                }
+            } else {
+                if (updatedData && updatedData.length > 0) {
+                    const index = cachedOrders.findIndex(o => o.id === orderId);
+                    if (index !== -1) {
+                        cachedOrders[index] = updatedData[0];
+                    }
+                }
+                closeOrderModal();
+                fetchOrders();
+            }
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-modal').classList.add('hidden');
+        }
+
+        // ==================== INQUIRIES FETCHING & MANAGEMENT ====================
+        async function fetchInquiries() {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const tbody = document.getElementById('inquiries-list');
+            tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">Loading inquiries...</td></tr>`;
+
+            const { data: inquiries, error } = await client
+                .from('inquiries')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error || !inquiries || inquiries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">No customer inquiries found.</td></tr>`;
+                return;
+            }
+
+            cachedInquiries = inquiries;
+            tbody.innerHTML = '';
+
+            inquiries.forEach(inq => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+                const inqDate = new Date(inq.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                tr.innerHTML = `
+                    <td class="p-4 text-xs text-gray-400">${inqDate}</td>
+                    <td class="p-4 font-medium text-gray-900">${inq.name || 'N/A'}</td>
+                    <td class="p-4 text-gray-500">${inq.email || 'N/A'}</td>
+                    <td class="p-4 text-gray-600 max-w-xs truncate">${inq.message || ''}</td>
+                    <td class="p-4 flex items-center gap-3">
+                        <button onclick="viewInquiryDetails('${inq.id}')" class="text-xs font-medium text-pink-600 hover:text-pink-800 underline">
+                            Read Message
+                        </button>
+                        <button onclick="deleteInquiry('${inq.id}')" class="text-xs font-medium text-red-500 hover:text-red-700">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function viewInquiryDetails(inquiryId) {
+            const inq = cachedInquiries.find(i => String(i.id) === String(inquiryId));
+            if (!inq) return;
+
+            const modalContent = document.getElementById('inquiry-modal-content');
+            const replyBtn = document.getElementById('inquiry-reply-btn');
+
+            const inqDate = new Date(inq.created_at).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            modalContent.innerHTML = `
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-1">
+                    <div><strong class="text-gray-900">From:</strong> ${inq.name || 'N/A'}</div>
+                    <div><strong class="text-gray-900">Email:</strong> ${inq.email || 'N/A'}</div>
+                    <div><strong class="text-gray-900">Received:</strong> ${inqDate}</div>
+                </div>
+                <div class="p-4 bg-white border border-gray-100 rounded-2xl">
+                    <strong class="block text-gray-900 mb-1">Message Body:</strong>
+                    <p class="text-gray-700 whitespace-pre-line leading-relaxed">${inq.message || 'No message content.'}</p>
+                </div>
+            `;
+
+            if (replyBtn) {
+                replyBtn.href = `mailto:${inq.email}?subject=Regarding your inquiry on PEPE KUN&body=Hi ${encodeURIComponent(inq.name || '')},%0D%0A%0D%0A`;
+            }
+
+            document.getElementById('inquiry-modal').classList.remove('hidden');
+        }
+
+        function closeInquiryModal() {
+            document.getElementById('inquiry-modal').classList.add('hidden');
+        }
+
+        async function deleteInquiry(id) {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            if (!confirm('Are you sure you want to delete this inquiry?')) return;
+
+            const { error } = await client
+                .from('inquiries')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Failed to delete inquiry: ' + error.message);
+            } else {
+                fetchInquiries();
+            }
+        }
+
+        // ==================== PRODUCT FORM & CATEGORIES LOGIC ====================
+        const formContainer = document.getElementById('product-form-container');
+        const form = document.getElementById('product-form');
+
+        function openAddProduct() {
+            form.reset();
+            document.getElementById('form-title').innerText = 'Add New Product';
+            document.getElementById('submit-btn').innerText = 'Save Product';
+            populateCategoryDropdown();
+            formContainer.classList.remove('hidden');
+            formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closeProductForm() {
+            formContainer.classList.add('hidden');
+        }
+
+        async function populateCategoryDropdown() {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const mainEl = document.getElementById('prod-category-main');
+            const subEl = document.getElementById('prod-category-sub');
+            if (!mainEl || !subEl) return;
+
+            const { data: categories, error } = await client
+                .from('categories')
+                .select('id, name, section')
+                .order('name', { ascending: true });
+
+            if (error) {
+                console.error('Error fetching categories for dropdown:', error.message);
+                return;
+            }
+
+            // keep anything already ticked if the form is open
+            const checked = new Set(
+                Array.from(document.querySelectorAll('.prod-cat-checkbox:checked')).map(c => c.value)
+            );
+
+            const render = (list, el, emptyMsg) => {
+                el.innerHTML = '';
+                if (list.length === 0) {
+                    el.innerHTML = `<p class="text-xs text-gray-400">${emptyMsg}</p>`;
+                    return;
+                }
+                list.forEach(cat => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center gap-2 cursor-pointer';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.value = cat.id;
+                    cb.className = 'prod-cat-checkbox prod-cat-' + (cat.section === 'sub' ? 'sub' : 'main') + ' accent-pink-500';
+                    cb.checked = checked.has(cat.id);
+                    const span = document.createElement('span');
+                    span.textContent = cat.name;
+                    label.appendChild(cb);
+                    label.appendChild(span);
+                    el.appendChild(label);
+                });
+            };
+
+            render(categories.filter(c => (c.section || 'main') !== 'sub'), mainEl, 'No main categories yet.');
+            render(categories.filter(c => c.section === 'sub'), subEl, 'No sub categories yet. Create one in the Categories tab.');
+        }
+
+        async function fetchProducts() {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const grid = document.getElementById('products-grid');
+
+            const { data: products, error } = await client
+                .from('products')
+                .select('*, product_categories(categories(name, section))')
+                .order('created_at', { ascending: false });
+
+            if (error || !products || products.length === 0) {
+                checkEmptyProducts();
+                return;
+            }
+
+            grid.innerHTML = '';
+            products.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border border-gray-200 rounded-3xl p-6 shadow-sm relative group/card flex flex-col justify-between';
+
+                const mainImg = (prod.images && prod.images.length > 0) ? prod.images[0] : 'https://via.placeholder.com/150';
+                const linked = (prod.product_categories || []).map(pc => pc.categories).filter(Boolean);
+                const badgesHtml = linked.length
+                    ? linked.map(c => `<span class="inline-block ${c.section === 'sub' ? 'bg-purple-50 text-purple-600' : 'bg-pink-50 text-pink-600'} text-xs px-3 py-1 rounded-full font-medium mr-1 mb-1">${c.name}</span>`).join('')
+                    : '<span class="inline-block bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full font-medium mb-1">Uncategorized</span>';
+
+                // Display colors badge if configured
+                const colorsList = (Array.isArray(prod.colors) && prod.colors.length > 0)
+                    ? `<div class="text-[11px] text-gray-500 mb-2 font-medium">🎨 Colors: ${prod.colors.join(', ')}</div>`
+                    : '';
+
+                card.innerHTML = `
+                    <div>
+                        <img src="${mainImg}" alt="${prod.title}" class="w-full h-48 object-cover rounded-2xl mb-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-800 text-lg">${prod.title}</h3>
+                            <span class="text-pink-600 font-bold">₹${parseFloat(prod.price).toFixed(2)}</span>
+                        </div>
+                        <div class="mb-1">${badgesHtml}</div>
+                        ${colorsList}
+                        <p class="text-gray-500 text-xs line-clamp-2 mb-4">${prod.description || ''}</p>
+                    </div>
+                    <button onclick="deleteProduct('${prod.id}')" class="absolute top-3 right-3 text-red-400 hover:text-red-600 hidden group-hover/card:block bg-red-50 rounded-full p-2 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function saveProduct() {
+            const client = window.supabaseClient;
+            if (!client) {
+                alert('Supabase client is not available.');
+                return;
+            }
+
+            const title = document.getElementById('prod-title').value.trim();
+            const mainIds = Array.from(document.querySelectorAll('.prod-cat-main:checked')).map(c => c.value);
+            const subIds = Array.from(document.querySelectorAll('.prod-cat-sub:checked')).map(c => c.value);
+            const categoryIds = [...mainIds, ...subIds];
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const description = document.getElementById('prod-desc').value.trim();
+            const specsRaw = document.getElementById('prod-specs').value.trim();
+
+            // Extract and format colors array from input
+            const colorsRaw = document.getElementById('prod-colors').value.trim();
+            const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
+
+            if (!title || mainIds.length === 0 || isNaN(price)) {
+                alert('Please fill in the product title, tick at least one main category, and set a price.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Uploading & Saving...';
+
+            const specifications = specsRaw ? specsRaw.split('\n').filter(line => line.trim() !== '') : [];
+
+            const imageUrls = [];
+            const imageInputs = [
+                document.getElementById('prod-img-1'),
+                document.getElementById('prod-img-2'),
+                document.getElementById('prod-img-3'),
+                document.getElementById('prod-img-4')
+            ];
+
+            try {
+                for (let i = 0; i < imageInputs.length; i++) {
+                    const input = imageInputs[i];
+                    if (input && input.files && input.files[0]) {
+                        const file = input.files[0];
+                        const fileExt = file.name.split('.').pop();
+                        const filePath = `prod_${Date.now()}_${i + 1}.${fileExt}`;
+
+                        const { error: uploadError } = await client.storage
+                            .from('product-images')
+                            .upload(filePath, file);
+
+                        if (uploadError) throw uploadError;
+
+                        const { data: urlData } = client.storage
+                            .from('product-images')
+                            .getPublicUrl(filePath);
+
+                        if (urlData?.publicUrl) {
+                            imageUrls.push(urlData.publicUrl);
+                        }
+                    }
+                }
+
+                const { data: newProduct, error: insertError } = await client
+                    .from('products')
+                    .insert([{
+                        title,
+                        category_id: mainIds[0], // legacy column: first main category
+                        price,
+                        description,
+                        specifications,
+                        images: imageUrls,
+                        colors: colors // Saves color JSON array (e.g. ["Pink", "Blue"])
+                    }])
+                    .select('id')
+                    .single();
+
+                if (insertError) throw insertError;
+
+                // link the product to every ticked main + sub category
+                const links = categoryIds.map(cid => ({ product_id: newProduct.id, category_id: cid }));
+                const { error: linkError } = await client
+                    .from('product_categories')
+                    .insert(links);
+
+                if (linkError) {
+                    await client.from('products').delete().eq('id', newProduct.id); // roll back
+                    throw linkError;
+                }
+
+                form.reset();
+                closeProductForm();
+                await fetchProducts();
+
+            } catch (err) {
+                alert('Error saving product: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Save Product';
+            }
+        }
+
+        async function deleteProduct(id) {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            if (!confirm('Are you sure you want to delete this product?')) return;
+
+            const { error } = await client
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Failed to delete product: ' + error.message);
+            } else {
+                fetchProducts();
+            }
+        }
+
+        function checkEmptyProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = `
+                <div class="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-200 rounded-2xl">
+                    No products added yet. Click "+ Add New Product" to get started.
+                </div>
+            `;
+        }
+
+        async function fetchCategories() {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            const { data: categories, error } = await client
+                .from('categories')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const grid = document.getElementById('categories-grid');
+
+            if (error || !categories || categories.length === 0) {
+                checkEmptyCategories();
+                return;
+            }
+
+            grid.innerHTML = '';
+            categories.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border border-gray-200 rounded-3xl p-6 text-center shadow-sm relative group/card';
+                card.innerHTML = `
+                ${cat.image_url ? `<img src="${cat.image_url}" alt="${cat.name}" class="w-20 h-20 object-cover rounded-2xl mx-auto mb-3">` : ''}
+                <h3 class="font-semibold text-gray-800 text-lg mb-2">${cat.name}</h3>
+                <span class="inline-block ${cat.section === 'sub' ? 'bg-purple-50 text-purple-600' : 'bg-pink-50 text-pink-600'} text-xs px-3 py-1 rounded-full font-medium mb-2">${cat.section === 'sub' ? 'Sub category' : 'Main category'}</span>
+                <button onclick="deleteCategory('${cat.id}')" class="absolute top-3 right-3 text-red-400 hover:text-red-600 hidden group-hover/card:block bg-red-50 rounded-full p-1 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            `;
+                grid.appendChild(card);
+            });
+        }
+
+        function addNewCategory() {
+            const emptyState = document.getElementById('empty-categories-state');
+            if (emptyState) emptyState.remove();
+
+            const grid = document.getElementById('categories-grid');
+            const newCard = document.createElement('div');
+            newCard.className = 'bg-white border border-gray-200 rounded-3xl p-6 text-center shadow-sm relative group/card animate-[fadeIn_0.3s_ease-in]';
+
+            newCard.innerHTML = `
+            <input type="text" placeholder="New Category Name" class="cat-name-input w-full text-center font-medium bg-transparent border-b border-gray-200 focus:outline-none focus:border-pink-400 mb-4 pb-1 transition-colors">
+            
+            <div class="mb-3 text-left">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Section</label>
+                <select class="cat-section-input w-full text-sm px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400">
+                    <option value="main">Main category</option>
+                    <option value="sub">Sub category (e.g. Special for Her)</option>
+                </select>
+            </div>
+
+            <div class="mb-4 text-left">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Category Thumbnail</label>
+                <input type="file" accept="image/*" class="cat-img-input w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100">
+            </div>
+
+            <button onclick="saveCategory(this)" class="text-xs font-medium text-white bg-gray-900 px-6 py-2 rounded-full hover:bg-gray-700 transition-colors w-full mt-2">Save Changes</button>
+            <button onclick="this.parentElement.remove(); checkEmptyCategories();" class="absolute top-3 right-3 text-red-400 hover:text-red-600 hidden group-hover/card:block bg-red-50 rounded-full p-1 transition-colors">
+                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+        `;
+
+            grid.insertBefore(newCard, grid.firstChild);
+        }
+
+        async function saveCategory(btnEl) {
+            const client = window.supabaseClient;
+            if (!client) {
+                alert('Supabase client failed to load.');
+                return;
+            }
+
+            const card = btnEl.closest('div');
+            const nameInput = card.querySelector('.cat-name-input');
+            const fileInput = card.querySelector('.cat-img-input');
+            const section = card.querySelector('.cat-section-input').value;
+
+            const categoryName = nameInput.value.trim();
+            const file = fileInput.files[0];
+
+            if (!categoryName) {
+                alert('Please enter a category name.');
+                return;
+            }
+
+            btnEl.disabled = true;
+            btnEl.innerText = 'Saving...';
+
+            let imageUrl = null;
+
+            try {
+                if (file) {
+                    const fileExt = file.name.split('.').pop();
+                    const filePath = `cat_${Date.now()}.${fileExt}`;
+
+                    const { error: uploadError } = await client.storage
+                        .from('category-images')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: urlData } = client.storage
+                        .from('category-images')
+                        .getPublicUrl(filePath);
+
+                    imageUrl = urlData.publicUrl;
+                }
+
+                const { error: insertError } = await client
+                    .from('categories')
+                    .insert([{ name: categoryName, image_url: imageUrl, section }]);
+
+                if (insertError) throw insertError;
+
+                await fetchCategories();
+                await populateCategoryDropdown();
+
+            } catch (err) {
+                alert('Error saving category: ' + err.message);
+                btnEl.disabled = false;
+                btnEl.innerText = 'Save Changes';
+            }
+        }
+
+        async function deleteCategory(id) {
+            const client = window.supabaseClient;
+            if (!client) return;
+
+            if (!confirm('Are you sure you want to delete this category?')) return;
+
+            const { error } = await client
+                .from('categories')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Failed to delete category: ' + error.message);
+            } else {
+                fetchCategories();
+                populateCategoryDropdown();
+            }
+        }
+
+        function checkEmptyCategories() {
+            const grid = document.getElementById('categories-grid');
+            if (grid.children.length === 0) {
+                grid.innerHTML = `
+                <div id="empty-categories-state" class="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-200 rounded-2xl">
+                    No categories created yet. Click "+ New Category" to add one.
+                </div>
+            `;
+            }
+        }
+
+        // EXPOSE ALL HANDLERS TO GLOBAL WINDOW SCOPE FOR HTML ONCLICK ATTRIBUTES
+        window.switchTab = switchTab;
+        window.handleLogout = handleLogout;
+        window.fetchOrders = fetchOrders;
+        window.updateOrderStatus = updateOrderStatus;
+        window.viewOrderDetails = viewOrderDetails;
+        window.saveOrderDetails = saveOrderDetails;
+        window.closeOrderModal = closeOrderModal;
+        window.fetchInquiries = fetchInquiries;
+        window.viewInquiryDetails = viewInquiryDetails;
+        window.closeInquiryModal = closeInquiryModal;
+        window.deleteInquiry = deleteInquiry;
+        window.openAddProduct = openAddProduct;
+        window.closeProductForm = closeProductForm;
+        window.saveProduct = saveProduct;
+        window.deleteProduct = deleteProduct;
+        window.addNewCategory = addNewCategory;
+        window.saveCategory = saveCategory;
+        window.deleteCategory = deleteCategory;
+        window.checkAuthGuard = checkAuthGuard;
+        window.fetchCategories = fetchCategories;
+        window.populateCategoryDropdown = populateCategoryDropdown;
+        window.fetchProducts = fetchProducts;
+    </script>
+</body>
+
+</html>

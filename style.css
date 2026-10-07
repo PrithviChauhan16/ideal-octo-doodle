@@ -1,0 +1,49 @@
+/* Global Background */
+body { 
+    background-color: #fdfbf7; 
+    background-image: url('pepekun-original-bg.png'); 
+    background-repeat: repeat;
+    background-size: 300px;
+    background-attachment: fixed;
+}
+@media (min-width: 768px) {
+    body { background-size: 500px; }
+}
+
+/* Floating Animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* Cloud Tags */
+.cloud-tag {
+    background: #ffffff;
+    border: 1px solid #2d2d2d;
+    border-radius: 50px;
+    position: absolute; top: 12px; left: 12px;
+    padding: 4px 12px; font-size: 0.65rem; font-weight: 500;
+    color: #2d2d2d; z-index: 10; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* Distinct Organic Pebble Shapes */
+.pepe-box-1 { 
+    border-radius: 45px 15px 45px 15px; 
+    border: 1px solid #2d2d2d; 
+}
+.pepe-box-2 { 
+    border-radius: 15px 45px 15px 45px; 
+    border: 1px solid #2d2d2d; 
+}
+.pepe-box-3 { 
+    border-radius: 35px 20px 45px 15px; 
+    border: 1px solid #2d2d2d; 
+}
+
+/* Smoothly morphs to a standard soft square on hover */
+.pepe-box-1:hover, .pepe-box-2:hover, .pepe-box-3:hover {
+    border-radius: 20px;
+    transition: border-radius 0.4s ease-in-out;
+}

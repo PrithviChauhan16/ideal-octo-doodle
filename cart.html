@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart | PEPE KUN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (window.tailwind) {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                        colors: { brand: { 50: '#fdfbf7', 900: '#1a1a1a' } }
+                    }
+                }
+            };
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-brand-900 antialiased selection:bg-pink-200 min-h-screen flex flex-col">
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-4 z-50 w-[95%] max-w-6xl mx-auto bg-white/40 backdrop-blur-md border border-white/50 px-6 py-4 shadow-lg rounded-full">
+        <div class="flex items-center justify-between">
+            <a href="index.html" class="flex items-center ml-2">
+                <img src="logo-peep.png" alt="PEPE KUN Logo" class="h-10 w-auto object-contain">
+            </a>
+            <div class="hidden md:flex gap-8 text-sm font-medium items-center absolute left-1/2 -translate-x-1/2">
+                <a href="index.html" class="hover:text-pink-500 transition-colors">Home</a>
+                <a href="index.html#categories" class="hover:text-pink-500 transition-colors">Categories</a>
+                <a href="index.html#contact" class="hover:text-pink-500 transition-colors">Contact</a>
+            </div>
+            <div class="hidden md:flex gap-4 text-sm font-medium items-center mr-2">
+                <a href="cart.html" class="text-pink-500 transition-colors flex items-center gap-1 font-semibold">
+                    Cart
+                </a>
+                <a href="login.html" id="cart-auth-btn" class="bg-brand-900 text-white px-6 py-2 rounded-full hover:bg-pink-500 transition-colors shadow-md min-w-[100px] text-center">Log In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CART MAIN CONTAINER -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-12 mt-8">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-semibold text-gray-900">Your Cart</h1>
+            <a href="index.html" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors border border-gray-300 rounded-full px-5 py-2">
+                ← Continue Shopping
+            </a>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-10">
+            <!-- Cart Items List -->
+            <div class="lg:w-2/3 flex flex-col gap-6" id="cart-container">
+                
+                <!-- Loading Skeleton -->
+                <div id="cart-loading" class="text-center py-16 bg-white rounded-3xl border border-gray-200 shadow-sm text-gray-500">
+                    Loading your cart...
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden text-center py-16 bg-white rounded-3xl border border-gray-200 shadow-sm">
+                    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    </div>
+                    <h2 class="text-xl font-medium text-gray-900 mb-2">Your cart is empty</h2>
+                    <p class="text-gray-500 mb-6 text-sm">Looks like you haven't added any companions yet.</p>
+                    <a href="index.html" class="inline-block bg-brand-900 text-white px-8 py-3 rounded-full font-medium hover:bg-pink-500 transition-colors">Start Shopping</a>
+                </div>
+
+                <!-- Cart Items List Dynamic Render Target -->
+                <div id="cart-items-list" class="flex flex-col gap-4"></div>
+
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="lg:w-1/3">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm sticky top-28">
+                    <h2 class="text-xl font-medium text-gray-900 mb-6">Order Summary</h2>
+                    
+                    <div class="space-y-4 text-sm text-gray-600 mb-6 border-b border-gray-100 pb-6">
+                        <div class="flex justify-between">
+                            <span>Subtotal (<span id="summary-count">0</span> items)</span>
+                            <span class="font-medium text-gray-900" id="summary-subtotal">₹0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Shipping</span>
+                            <span class="font-medium text-gray-900">Calculated at checkout</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-8">
+                        <span class="text-base font-medium text-gray-900">Total</span>
+                        <span class="text-2xl font-semibold text-gray-900" id="summary-total">₹0.00</span>
+                    </div>
+                    
+                    <button id="checkout-btn" disabled class="w-full bg-brand-900 text-white py-4 rounded-full font-medium hover:bg-pink-500 transition-colors shadow-md text-center opacity-50 cursor-not-allowed">
+                        Proceed to Checkout
+                    </button>
+                    
+                    <div class="mt-4 text-center">
+                        <span class="text-xs text-gray-400">Secure checkout powered by PEPE KUN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SUPABASE CART LOGIC MODULE -->
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUser = null;
+        let cartItems = [];
+
+        async function initCart() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                currentUser = user;
+
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('full_name')
+                        .eq('id', user.id)
+                        .single();
+
+                    const displayName = profile?.full_name || user.email?.split('@')[0] || 'Account';
+                    const authBtn = document.getElementById('cart-auth-btn');
+                    if (authBtn) {
+                        authBtn.textContent = displayName;
+                        authBtn.href = 'account.html';
+                    }
+
+                    await loadCartFromSupabase();
+                } else {
+                    loadCartFromLocalStorage();
+                }
+            } catch (err) {
+                console.error('Error initializing cart:', err);
+                loadCartFromLocalStorage();
+            }
+        }
+
+        async function loadCartFromSupabase() {
+            const { data, error } = await supabase
+                .from('cart')
+                .select('id, quantity, product_id, selected_color, products(*)')
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                console.error('Error loading Supabase cart:', error);
+                loadCartFromLocalStorage();
+                return;
+            }
+
+            cartItems = (data || []).map(row => ({
+                cartRecordId: row.id,
+                productId: row.product_id,
+                quantity: row.quantity,
+                selected_color: row.selected_color || null,
+                title: row.products?.title || 'Unknown Product',
+                price: parseFloat(row.products?.price || 0),
+                image: parseImage(row.products?.images)
+            }));
+
+            saveToLocalStorage();
+            renderCart();
+        }
+
+        function loadCartFromLocalStorage() {
+            const local = JSON.parse(localStorage.getItem('pepe_cart') || '[]');
+            cartItems = local.map(item => ({
+                cartRecordId: item.cart_id || null,
+                productId: item.id || item.productId,
+                quantity: item.quantity || 1,
+                selected_color: item.selected_color || null,
+                title: item.title || 'Product',
+                price: parseFloat(item.price || 0),
+                image: parseImage(item.images || item.image)
+            }));
+            renderCart();
+        }
+
+        function parseImage(images) {
+            if (typeof images === 'string' && images.startsWith('http')) return images;
+            if (Array.isArray(images)) return images[0] || 'https://via.placeholder.com/150';
+            try {
+                const parsed = JSON.parse(images);
+                return parsed[0] || 'https://via.placeholder.com/150';
+            } catch {
+                return 'https://via.placeholder.com/150';
+            }
+        }
+
+        function renderCart() {
+            const loadingEl = document.getElementById('cart-loading');
+            const emptyStateEl = document.getElementById('empty-state');
+            const itemsListEl = document.getElementById('cart-items-list');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            if (loadingEl) loadingEl.classList.add('hidden');
+
+            if (cartItems.length === 0) {
+                emptyStateEl.classList.remove('hidden');
+                itemsListEl.innerHTML = '';
+                updateSummary(0, 0);
+                checkoutBtn.disabled = true;
+                checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                return;
+            }
+
+            emptyStateEl.classList.add('hidden');
+            checkoutBtn.disabled = false;
+            checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            let totalQty = 0;
+            let subtotal = 0;
+
+            itemsListEl.innerHTML = cartItems.map((item, index) => {
+                totalQty += item.quantity;
+                subtotal += item.price * item.quantity;
+
+                return `
+                    <div class="cart-item bg-white p-4 sm:p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300">
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <img src="${item.image}" alt="${item.title}" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-2xl border border-gray-100 flex-shrink-0">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 text-base sm:text-lg">${item.title}</h3>
+                                ${item.selected_color ? `<p class="text-xs text-gray-500 font-medium mt-0.5">Color: <span class="text-pink-600 font-semibold">${item.selected_color}</span></p>` : ''}
+                                <p class="text-pink-500 font-bold text-sm sm:text-base mt-1">₹${item.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
+                            <div class="flex items-center border border-gray-200 rounded-full bg-gray-50 px-3 py-1.5">
+                                <button onclick="changeQty(${index}, -1)" class="text-gray-500 hover:text-gray-900 font-bold px-2">-</button>
+                                <span class="mx-3 text-sm font-semibold text-gray-800">${item.quantity}</span>
+                                <button onclick="changeQty(${index}, 1)" class="text-gray-500 hover:text-gray-900 font-bold px-2">+</button>
+                            </div>
+                            <span class="font-bold text-gray-900 text-base min-w-[70px] text-right">₹${(item.price * item.quantity).toFixed(2)}</span>
+                            <button onclick="removeCartItem(${index})" class="text-gray-400 hover:text-red-500 transition-colors p-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateSummary(totalQty, subtotal);
+        }
+
+        function updateSummary(count, subtotal) {
+            document.getElementById('summary-count').innerText = count;
+            document.getElementById('summary-subtotal').innerText = '₹' + subtotal.toFixed(2);
+            document.getElementById('summary-total').innerText = '₹' + subtotal.toFixed(2);
+        }
+
+        async function changeQty(index, delta) {
+            const item = cartItems[index];
+            if (!item) return;
+
+            const newQty = item.quantity + delta;
+            if (newQty < 1) return;
+
+            item.quantity = newQty;
+
+            if (currentUser && item.cartRecordId) {
+                await supabase
+                    .from('cart')
+                    .update({ quantity: newQty, updated_at: new Date().toISOString() })
+                    .eq('id', item.cartRecordId);
+            }
+
+            saveToLocalStorage();
+            renderCart();
+        }
+
+        async function removeCartItem(index) {
+            const item = cartItems[index];
+            if (!item) return;
+
+            if (currentUser && item.cartRecordId) {
+                await supabase
+                    .from('cart')
+                    .delete()
+                    .eq('id', item.cartRecordId);
+            }
+
+            cartItems.splice(index, 1);
+            saveToLocalStorage();
+            renderCart();
+        }
+
+        function saveToLocalStorage() {
+            const formatted = cartItems.map(i => ({
+                id: i.productId,
+                title: i.title,
+                price: i.price,
+                image: i.image,
+                quantity: i.quantity,
+                selected_color: i.selected_color
+            }));
+            localStorage.setItem('pepe_cart', JSON.stringify(formatted));
+        }
+
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            saveToLocalStorage();
+            window.location.href = 'checkout.html';
+        });
+
+        window.changeQty = changeQty;
+        window.removeCartItem = removeCartItem;
+
+        document.addEventListener('DOMContentLoaded', initCart);
+    </script>
+</body>
+</html>

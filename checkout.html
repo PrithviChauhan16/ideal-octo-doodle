@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEPE KUN | Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Outfit', 'sans-serif'] }, colors: { brand: { 900: '#1a1a1a' } } } } }
+    </script>
+    <style>
+        body { 
+            background-color: #fff3ff;
+            background-image: url('pepekun-original-bg.png'); 
+            background-repeat: repeat;
+            background-size: 300px;
+            background-attachment: fixed;
+        }
+        @media (min-width: 768px) { body { background-size: 500px; } }
+    </style>
+</head>
+<body class="text-brand-900 antialiased selection:bg-pink-200">
+
+    <!-- Navbar -->
+    <nav class="sticky top-4 z-50 w-[95%] max-w-6xl mx-auto bg-white/60 backdrop-blur-md border border-white/50 px-6 py-4 shadow-md rounded-full flex justify-between items-center">
+        <a href="cart.html" class="text-sm font-medium hover:text-pink-500 transition-colors">← Back to Cart</a>
+        <span class="text-xl font-bold tracking-wide">Checkout</span>
+        <div class="w-16"></div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-12 gap-8">
+        
+        <!-- Left Column: Shipping & Payment Details -->
+        <div class="md:col-span-7 bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-xl border border-white space-y-6">
+            
+            <form id="checkout-form" class="space-y-6">
+                <!-- Section 1: Shipping Details -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-900 border-b pb-2">1. Shipping Details</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Full Name</label>
+                            <input type="text" id="cust-name" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white text-sm" required>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
+                                <input type="email" id="cust-email" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-gray-50 text-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Phone Number</label>
+                                <input type="tel" id="cust-phone" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white text-sm" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Shipping Address</label>
+                            <textarea id="cust-address" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white text-sm" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: UPI Payment -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-900 border-b pb-2">2. Pay via UPI</h2>
+                    <div class="bg-pink-50/60 p-6 rounded-2xl border border-pink-100 flex flex-col items-center text-center space-y-4">
+                        <p class="text-xs text-gray-600 font-medium">Scan QR code using GPay, PhonePe, Paytm or any UPI app</p>
+                        
+                        <!-- Dynamic UPI QR -->
+                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-pink-100">
+                            <img id="upi-qr" src="" alt="UPI QR Code" class="w-44 h-44 object-contain">
+                        </div>
+
+                        <div class="w-full text-left space-y-1">
+                            <label class="block text-xs font-semibold text-gray-700">UPI Transaction / UTR / Reference ID *</label>
+                            <input type="text" id="transaction-id" placeholder="e.g. 4268XXXXXX12" class="w-full px-4 py-3 rounded-xl border border-pink-200 focus:outline-none focus:border-pink-400 bg-white text-sm" required>
+                            <p class="text-[11px] text-gray-400">Enter the 12-digit UTR/Reference ID from your payment confirmation screen.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="place-order-btn" class="w-full py-4 bg-brand-900 text-white rounded-full font-bold hover:bg-pink-500 transition-all shadow-lg text-base">
+                    Submit Order for Verification
+                </button>
+            </form>
+
+        </div>
+
+        <!-- Right Column: Order Summary -->
+        <div class="md:col-span-5 bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-xl border border-white h-fit space-y-6">
+            <h2 class="text-xl font-semibold border-b pb-2 text-gray-900">Order Summary</h2>
+            
+            <div id="checkout-cart-items" class="divide-y divide-gray-100 max-h-64 overflow-y-auto pr-1">
+                <!-- Items populated via JS -->
+            </div>
+
+            <div class="border-t border-gray-100 pt-4 space-y-2 text-sm">
+                <div class="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">₹0.00</span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                    <span>Shipping</span>
+                    <span class="text-green-600 font-medium">FREE</span>
+                </div>
+                <div class="flex justify-between text-base font-bold text-gray-900 border-t pt-3">
+                    <span>Total Amount</span>
+                    <span id="summary-total" class="text-pink-600">₹0.00</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- SUPABASE CHECKOUT LOGIC MODULE -->
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const MERCHANT_UPI_ID = "9891564185@pthdfc"; 
+        const MERCHANT_NAME = "PEPE KUN";
+
+        let currentUser = null;
+        let cartItems = [];
+        let totalAmount = 0;
+
+        async function initCheckout() {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('cust-email').value = user.email || '';
+
+            // Read from synchronized localStorage key
+            cartItems = JSON.parse(localStorage.getItem('pepe_cart') || '[]');
+
+            if (cartItems.length === 0) {
+                alert('Your cart is empty!');
+                window.location.href = 'cart.html';
+                return;
+            }
+
+            renderOrderSummary();
+            await loadUserProfile();
+        }
+
+        async function loadUserProfile() {
+            const { data } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+
+            if (data) {
+                document.getElementById('cust-name').value = data.full_name || '';
+                document.getElementById('cust-phone').value = data.phone || '';
+                document.getElementById('cust-address').value = data.address || '';
+            }
+        }
+
+        function renderOrderSummary() {
+            const container = document.getElementById('checkout-cart-items');
+            totalAmount = 0;
+
+            container.innerHTML = cartItems.map(item => {
+                const itemTotal = (parseFloat(item.price || 0) * parseInt(item.quantity || 1));
+                totalAmount += itemTotal;
+
+                return `
+                    <div class="py-3 flex items-center justify-between text-sm">
+                        <div class="flex items-center gap-3">
+                            ${item.image ? `<img src="${item.image}" class="w-10 h-10 object-cover rounded-lg border border-gray-100">` : ''}
+                            <div>
+                                <p class="font-medium text-gray-800 line-clamp-1">${item.title || 'Product'}</p>
+                                ${item.selected_color ? `<p class="text-xs text-gray-500 font-medium mt-0.5">Color: <span class="text-pink-600 font-semibold">${item.selected_color}</span></p>` : ''}
+                                <p class="text-xs text-gray-400">Qty: ${item.quantity || 1}</p>
+                            </div>
+                        </div>
+                        <span class="font-semibold text-gray-900">₹${itemTotal.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('summary-subtotal').innerText = `₹${totalAmount.toFixed(2)}`;
+            document.getElementById('summary-total').innerText = `₹${totalAmount.toFixed(2)}`;
+
+            const upiString = `upi://pay?pa=${MERCHANT_UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${totalAmount.toFixed(2)}&cu=INR`;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiString)}`;
+            document.getElementById('upi-qr').src = qrApiUrl;
+        }
+
+        async function processCheckout(e) {
+            e.preventDefault();
+            const btn = document.getElementById('place-order-btn');
+            btn.innerText = "Placing Order...";
+            btn.disabled = true;
+
+            const customer_name = document.getElementById('cust-name').value.trim();
+            const customer_email = document.getElementById('cust-email').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const shipping_address = document.getElementById('cust-address').value.trim();
+            const transaction_id = document.getElementById('transaction-id').value.trim();
+
+            const { error } = await supabase
+                .from('orders')
+                .insert([
+                    {
+                        user_id: currentUser.id,
+                        customer_name,
+                        customer_email,
+                        phone,
+                        shipping_address,
+                        transaction_id,
+                        items: cartItems,
+                        total_amount: totalAmount,
+                        status: 'Pending Verification'
+                    }
+                ]);
+
+            if (error) {
+                console.error('Checkout error:', error);
+                alert('Failed to place order. Please try again.');
+                btn.disabled = false;
+                btn.innerText = "Submit Order for Verification";
+                return;
+            }
+
+            // Clear database cart table for logged in user
+            await supabase.from('cart').delete().eq('user_id', currentUser.id);
+
+            // Clear local storage
+            localStorage.removeItem('pepe_cart');
+
+            alert('Order submitted successfully! The admin will verify your payment shortly.');
+            window.location.href = 'account.html';
+        }
+
+        document.getElementById('checkout-form').addEventListener('submit', processCheckout);
+        document.addEventListener('DOMContentLoaded', initCheckout);
+    </script>
+</body>
+</html>

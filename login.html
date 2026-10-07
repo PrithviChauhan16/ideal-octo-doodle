@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEPE KUN | Log In & Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] }, 
+                    colors: { brand: { 900: '#1a1a1a' } } 
+                } 
+            } 
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #fff3ff;
+            background-attachment: fixed;
+        }
+        @keyframes float { 
+            0% { transform: translateY(0px); } 
+            50% { transform: translateY(-12px); } 
+            100% { transform: translateY(0px); } 
+        }
+        .animate-float { 
+            animation: float 4s ease-in-out infinite; 
+        }
+    </style>
+</head>
+
+<body class="text-brand-900 antialiased selection:bg-pink-200 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white/80 backdrop-blur-md p-8 md:p-10 rounded-[3rem] shadow-2xl border border-white animate-float w-full max-w-md transition-all duration-500">
+        
+        <a href="index.html" class="text-sm font-medium text-gray-500 hover:text-pink-500 transition-colors mb-6 inline-block">
+            ← Back to Shop
+        </a>
+        
+        <div class="flex bg-gray-100 rounded-full p-1 mb-8">
+            <button onclick="toggleForm('login')" id="tab-login" class="flex-1 py-2 text-sm font-semibold rounded-full bg-white shadow text-gray-900 transition-all">
+                Log In
+            </button>
+            <button onclick="toggleForm('signup')" id="tab-signup" class="flex-1 py-2 text-sm font-semibold rounded-full text-gray-500 hover:text-gray-900 transition-all">
+                Sign Up
+            </button>
+        </div>
+
+        <!-- Alert Banner for Errors/Messages -->
+        <div id="auth-alert" class="hidden mb-4 p-3 rounded-2xl text-xs font-medium transition-all"></div>
+
+        <form id="form-login" class="space-y-6 block">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-semibold mb-1">Welcome Back</h2>
+                <p class="text-gray-500 font-light text-sm">
+                    Enter your email to sign in.
+                </p>
+            </div>
+
+            <input type="email" id="login-email" placeholder="Email Address" class="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white/90 text-sm" required>
+            <input type="password" id="login-password" placeholder="Password" class="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white/90 text-sm" required>
+
+            <button type="submit" id="login-btn" class="w-full py-4 bg-brand-900 text-white rounded-full font-medium hover:bg-pink-500 transition-colors shadow-lg">
+                Sign In
+            </button>
+        </form>
+
+        <form id="form-signup" class="space-y-4 hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-semibold mb-1">Join the Family</h2>
+                <p class="text-gray-500 font-light text-sm">
+                    Create an account to track your companions.
+                </p>
+            </div>
+
+            <input type="text" id="signup-name" placeholder="Full Name" class="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white/90 text-sm" required>
+            <input type="email" id="signup-email" placeholder="Email Address" class="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white/90 text-sm" required>
+            <input type="password" id="signup-password" placeholder="Create Password" class="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-300 bg-white/90 text-sm" required>
+
+            <button type="submit" id="signup-btn" class="w-full py-4 bg-brand-900 text-white rounded-full font-medium hover:bg-pink-500 transition-colors shadow-lg mt-2">
+                Create Account
+            </button>
+        </form>
+    </div>
+
+<script>
+function toggleForm(type) {
+    const alertBox = document.getElementById('auth-alert');
+    alertBox.classList.add('hidden');
+
+    const loginForm = document.getElementById('form-login');
+    const signupForm = document.getElementById('form-signup');
+    const loginTab = document.getElementById('tab-login');
+    const signupTab = document.getElementById('tab-signup');
+
+    loginForm.classList.toggle('hidden', type !== 'login');
+    signupForm.classList.toggle('hidden', type !== 'signup');
+
+    loginTab.classList.toggle('bg-white', type === 'login');
+    loginTab.classList.toggle('shadow', type === 'login');
+    loginTab.classList.toggle('text-gray-900', type === 'login');
+    loginTab.classList.toggle('text-gray-500', type !== 'login');
+
+    signupTab.classList.toggle('bg-white', type === 'signup');
+    signupTab.classList.toggle('shadow', type === 'signup');
+    signupTab.classList.toggle('text-gray-900', type === 'signup');
+    signupTab.classList.toggle('text-gray-500', type !== 'signup');
+}
+</script>
+
+<script type="module">
+import { supabase } from './supabaseClient.js';
+
+function showAlert(message, isError = true) {
+    const alertBox = document.getElementById('auth-alert');
+    alertBox.textContent = message;
+    alertBox.className = `mb-4 p-3 rounded-2xl text-xs font-medium block text-center ${
+        isError ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'
+    }`;
+}
+
+// Helper function to check role from public.profiles table directly
+async function checkUserRoleAndRedirect(userId) {
+    const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+    if (!error && profile && profile.role === 'admin') {
+        window.location.href = 'admin.html';
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+// Redirect existing active session
+async function checkExistingSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+        await checkUserRoleAndRedirect(session.user.id);
+    }
+}
+checkExistingSession();
+
+// Handle Login Form Submission
+document.getElementById('form-login').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        showAlert(error.message, true);
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+    } else if (data.user) {
+        await checkUserRoleAndRedirect(data.user.id);
+    }
+});
+
+// Handle Signup Form Submission
+document.getElementById('form-signup').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const btn = document.getElementById('signup-btn');
+    
+    const fullName = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+
+    if (password.length < 6) {
+        showAlert('Password must be at least 6 characters.', true);
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating Account...';
+
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: {
+                full_name: fullName
+            }
+        }
+    });
+
+    if (error) {
+        showAlert(error.message, true);
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+    } else {
+        showAlert('Account created! Check your email for confirmation or log in.', false);
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+    }
+});
+</script>
+</body>
+</html>
