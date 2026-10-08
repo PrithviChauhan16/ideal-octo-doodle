@@ -659,6 +659,40 @@ import { supabase } from './supabaseClient.js';
           track.scrollBy({ left: direction * width, behavior: 'smooth' });
       }
   }
+  async function loadCutestPepesShowcase() {
+    const track = document.getElementById('cutest-pepes-track');
+    if (!track) return;
+
+    try {
+      const { data: promoProducts } = await supabase
+        .from('products')
+        .select('*')
+        .limit(6);
+
+      if (!promoProducts || promoProducts.length === 0) return;
+
+      const cardsHTML = promoProducts.map(prod => {
+        let imagesArr = [];
+        try {
+          imagesArr = Array.isArray(prod.images) ? prod.images : JSON.parse(prod.images || '[]');
+        } catch(e) {
+          imagesArr = [prod.images || '1.png'];
+        }
+        const img = imagesArr[0] || '1.png';
+
+        return `
+          <div onclick="openProductModal('${prod.id}')" class="w-48 md:w-60 aspect-square bg-white rounded-3xl p-3 shadow-sm border border-white/80 flex items-center justify-center shrink-0 cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all">
+              <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain rounded-2xl select-none pointer-events-none">
+          </div>
+        `;
+      }).join('');
+
+      // Duplicate once for infinite loop effect
+      track.innerHTML = cardsHTML + cardsHTML;
+    } catch (err) {
+      console.error('Error loading showcase:', err);
+    }
+  }
 
   // 9. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
