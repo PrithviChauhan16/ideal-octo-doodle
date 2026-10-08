@@ -593,7 +593,7 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 9. Cutest Pepes Dynamic Interactive Showcase
+// 9. Cutest Pepes Dynamic Interactive Showcase
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
@@ -622,8 +622,9 @@ import { supabase } from './supabaseClient.js';
         const img = imagesArr[0] || '1.png';
         const escapedImages = JSON.stringify(imagesArr).replace(/"/g, '&quot;');
 
+        // Strictly sized container prevents blow-up
         return `
-          <div onclick="openFullscreenGallery(${escapedImages}, 0)" class="w-52 md:w-64 aspect-square bg-white rounded-[2.5rem] p-4 shadow-md hover:shadow-2xl border border-white/90 flex items-center justify-center shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-300 group overflow-hidden" title="Click to view full photos">
+          <div onclick="openFullscreenGallery(${escapedImages}, 0)" class="w-52 md:w-64 h-52 md:h-64 aspect-square bg-white rounded-[2.5rem] p-4 shadow-md hover:shadow-2xl border border-white/90 flex items-center justify-center shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-300 group overflow-hidden" title="Click to view full photos">
               <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain rounded-3xl select-none pointer-events-none group-hover:scale-105 transition-transform duration-500">
           </div>
         `;
