@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PEPE KUN | Discover Softness</title>
+    <!-- Fixes the favicon 404 error -->
+    <link rel="icon" href="1pepe-logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -56,7 +58,6 @@
         }
 
         @media (min-width: 768px) {
-
             .bg-section-1,
             .bg-section-2 {
                 background-attachment: fixed;
@@ -95,7 +96,7 @@
                     In</a>
             </div>
 
-            <!-- Mobile Hamburger Button1 -->
+            <!-- Mobile Hamburger Button -->
             <button onclick="toggleMobileMenu()"
                 class="md:hidden p-2 text-gray-600 hover:text-pink-500 focus:outline-none transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +125,6 @@
 
     <!-- UNIFIED HERO, CATEGORY & PRODUCT BACKGROUND -->
     <div class="bg-section-2 relative overflow-hidden w-full min-h-screen">
-        <!-- Semi-transparent overlay -->
         <div class="absolute inset-0 bg-white/50 backdrop-blur-sm z-0 pointer-events-none"></div>
 
         <div class="relative z-10 pt-24 md:pt-28 pb-16">
@@ -136,39 +136,39 @@
                     alt="Pepe Kun Banner">
             </header>
 
-            <!-- MAIN CATEGORIES (SWIPE CARDS) -->
+            <!-- MAIN CATEGORIES -->
             <section id="categories" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16 transition-all duration-500">
                 <div class="text-center mb-8">
                     <h2 class="text-2xl md:text-3xl font-medium tracking-wide text-gray-900">Choose Your Companion</h2>
                 </div>
                 <div class="relative">
                     <button type="button" data-arrow="left" onclick="scrollCategoryRow('category-grid', -1)" aria-label="Scroll left"
-                        class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">&#8249;</button>
+                        class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">‹</button>
                     <div id="category-grid" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 no-scrollbar py-4 px-2 scroll-pl-2 overscroll-x-contain">
-                        <!-- Swipeable category cards rendered here dynamically -->
+                        <!-- Dynamic categories go here -->
                     </div>
                     <button type="button" data-arrow="right" onclick="scrollCategoryRow('category-grid', 1)" aria-label="Scroll right"
-                        class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">&#8250;</button>
+                        class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">›</button>
                 </div>
             </section>
 
-            <!-- SUB CATEGORIES / COLLECTIONS (SWIPE CARDS) -->
+            <!-- SUB CATEGORIES / COLLECTIONS -->
             <section id="collections-section" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
                 <div class="text-center mb-6">
                     <h2 class="text-xl md:text-2xl font-semibold tracking-wide text-gray-900">Curated Collections</h2>
                 </div>
                 <div class="relative">
                     <button type="button" data-arrow="left" onclick="scrollCategoryRow('collection-grid', -1)" aria-label="Scroll left"
-                        class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">&#8249;</button>
+                        class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">‹</button>
                     <div id="collection-grid" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 no-scrollbar py-4 px-2 scroll-pl-2 overscroll-x-contain">
-                        <!-- Swipeable category cards rendered here dynamically -->
+                        <!-- Dynamic categories go here -->
                     </div>
                     <button type="button" data-arrow="right" onclick="scrollCategoryRow('collection-grid', 1)" aria-label="Scroll right"
-                        class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">&#8250;</button>
+                        class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">›</button>
                 </div>
             </section>
 
-            <!-- HIDDEN PRODUCT POP-UP SECTION (FROM CATEGORY CLICK) -->
+            <!-- PRODUCT DISPLAY GRID -->
             <section id="product-display" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-24 hidden opacity-0 transition-opacity duration-500">
                 <div class="flex items-center justify-between mb-8 md:mb-10 border-b border-gray-300 pb-4">
                     <h2 id="current-category-title" class="text-xl md:text-2xl font-semibold text-gray-900">Products</h2>
@@ -177,7 +177,7 @@
                     </button>
                 </div>
                 <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-                    <!-- Products will be rendered here dynamically -->
+                    <!-- Products rendered dynamically -->
                 </div>
             </section>
 
@@ -189,34 +189,27 @@
         <div class="absolute inset-0 bg-white/50 backdrop-blur-sm z-0 pointer-events-none"></div>
 
         <div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center mt-8">
-
             <!-- Left Card -->
             <div class="relative w-full aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-xl border border-white/50 bg-white">
-                <img id="card-left-img" src="1.png" 
-                    class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Left">
+                <img id="card-left-img" src="1.png" class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Left">
                 <div class="absolute bottom-5 left-5 right-5 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
                     <div id="progress-left" class="h-full bg-white/90 w-0 rounded-full"></div>
                 </div>
             </div>
-
             <!-- Center Card -->
             <div class="relative w-full aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/50 bg-white md:scale-105 z-10">
-                <img id="card-center-img" src="4.png" 
-                    class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Center">
+                <img id="card-center-img" src="4.png" class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Center">
                 <div class="absolute bottom-5 left-5 right-5 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
                     <div id="progress-center" class="h-full bg-white/90 w-0 rounded-full"></div>
                 </div>
             </div>
-
             <!-- Right Card -->
             <div class="relative w-full aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-xl border border-white/50 bg-white">
-                <img id="card-right-img" src="7.png" 
-                    class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Right">
+                <img id="card-right-img" src="7.png" class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Right">
                 <div class="absolute bottom-5 left-5 right-5 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
                     <div id="progress-right" class="h-full bg-white/90 w-0 rounded-full"></div>
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -232,8 +225,7 @@
                     materials, unique branding, and unparalleled softness.</p>
             </div>
             <div class="h-[300px] md:h-[450px] rounded-[2rem] overflow-hidden border border-white/50 shadow-lg">
-                <img src="11.png"
-                    class="w-full h-full object-cover" alt="About Pepe Kun">
+                <img src="11.png" class="w-full h-full object-cover" alt="About Pepe Kun">
             </div>
         </div>
     </section>
@@ -272,38 +264,34 @@
         &copy; 2026 PEPE KUN. All rights reserved.
     </footer>
 
-    <!-- PRODUCT QUICK-VIEW MODAL (DYNAMICALLY POPULATED) -->
+    <!-- PRODUCT QUICK-VIEW MODAL -->
     <div id="product-modal"
         class="fixed inset-0 z-[100] hidden items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-pointer" onclick="closeModal()"></div>
-        <div
-            class="relative w-full max-w-5xl bg-white rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
+        <div class="relative w-full max-w-5xl bg-white rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
 
             <button onclick="closeModal()"
                 class="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur border border-gray-200 p-2 rounded-full hover:bg-gray-100 text-gray-800 transition-transform">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
 
-<div class="md:w-1/2 p-6 bg-gray-50 flex flex-col gap-4 overflow-y-auto border-r border-gray-100">
-                
-                <!-- NEW SWIPEABLE MODAL IMAGE CONTAINER -->
-                <div class="w-full aspect-square rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-sm relative group">
-                    
-                    <div id="modal-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative touch-pan-x">
-                        <!-- Dynamic swipeable images will be injected here by script.js -->
-                    </div>
+            <!-- Image Track & Thumbnails Area -->
+            <div class="md:w-1/2 p-6 bg-gray-50 flex flex-col gap-4 overflow-y-auto border-r border-gray-100">
+                <div class="relative w-full aspect-square rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-sm group/modal-slider">
+                    <!-- Swipeable Track container -->
+                    <div id="modal-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x"></div>
 
-                    <!-- Desktop Arrows for Modal -->
-                    <button onclick="scrollModalSlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md z-30 text-2xl pb-1 cursor-pointer">‹</button>
-                    <button onclick="scrollModalSlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md z-30 text-2xl pb-1 cursor-pointer">›</button>
+                    <!-- Desktop Navigation Arrows -->
+                    <button onclick="scrollModalSlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover/modal-slider:opacity-100 transition-all shadow-md z-30 pb-1 text-2xl leading-none cursor-pointer">‹</button>
+                    <button onclick="scrollModalSlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover/modal-slider:opacity-100 transition-all shadow-md z-30 pb-1 text-2xl leading-none cursor-pointer">›</button>
                 </div>
 
                 <div class="grid grid-cols-4 gap-3 mt-2" id="modal-thumbnails"></div>
             </div>
 
+            <!-- Details Area -->
             <div class="md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
                 <div class="text-[11px] text-gray-500 font-bold tracking-widest uppercase mb-2" id="modal-category">
                 </div>
@@ -338,6 +326,19 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- FULLSCREEN IMAGE GALLERY OVERLAY -->
+    <div id="fullscreen-gallery" class="fixed inset-0 z-[200] hidden flex-col bg-black/95 opacity-0 transition-opacity duration-300">
+        <button onclick="closeFullscreenGallery()" class="absolute top-4 right-4 z-50 text-white/80 p-4 hover:text-white transition-colors cursor-pointer">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <div id="gallery-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative touch-pan-x items-center"></div>
+        
+        <button onclick="scrollGallerySlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">‹</button>
+        <button onclick="scrollGallerySlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">›</button>
+        
+        <div id="gallery-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-medium tracking-widest text-sm z-50 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur"></div>
     </div>
 
     <script>
@@ -397,7 +398,7 @@
         const leftImgEl = document.getElementById('card-left-img');
         const centerImgEl = document.getElementById('card-center-img');
         const rightImgEl = document.getElementById('card-right-img');
-        
+
         const progLeft = document.getElementById('progress-left');
         const progCenter = document.getElementById('progress-center');
         const progRight = document.getElementById('progress-right');
@@ -438,28 +439,8 @@
         }, 6000);
     </script>
 
-    <!-- EXTERNAL JS FOR SUPABASE & STOREFRONT LOGIC -->
+    <!-- EXTERNAL JS -->
     <script type="module" src="script.js"></script>
-    <!-- FULLSCREEN IMAGE GALLERY OVERLAY -->
-    <div id="fullscreen-gallery" class="fixed inset-0 z-[200] hidden flex-col bg-black/95 opacity-0 transition-opacity duration-300">
-        
-        <!-- Close Button -->
-        <button onclick="closeFullscreenGallery()" class="absolute top-4 right-4 z-50 text-white/80 p-4 hover:text-white transition-colors cursor-pointer">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-
-        <!-- Swipeable Gallery Track -->
-        <div id="gallery-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative touch-pan-x items-center">
-            <!-- Dynamic images will be injected here -->
-        </div>
-
-        <!-- Desktop Arrows -->
-        <button onclick="scrollGallerySlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">‹</button>
-        <button onclick="scrollGallerySlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">›</button>
-        
-        <!-- Image Counter -->
-        <div id="gallery-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-medium tracking-widest text-sm z-50 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur"></div>
-    </div>
 </body>
 
 </html>
