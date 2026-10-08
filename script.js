@@ -86,6 +86,7 @@ import { supabase } from './supabaseClient.js';
     localStorage.setItem('pepe_cart', JSON.stringify(cart));
   }
 
+  // Color selection helper
   function selectColor(color, btnElement) {
     selectedColor = color;
     document.querySelectorAll('.color-btn').forEach(btn => {
@@ -194,22 +195,8 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 3. Category Fetching with Skeleton Loaders
+  // 3. Category Fetching
   async function loadCategoriesAndCollections() {
-    const catGrid = document.getElementById('category-grid');
-    const colGrid = document.getElementById('collection-grid');
-    
-    // Inject loading skeletons instantly
-    const skeletonHTML = Array(5).fill(`
-      <div class="flex-none w-40 md:w-52 snap-start bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-pulse text-center">
-        <div class="w-full aspect-square rounded-2xl bg-gray-200 mb-3 border border-gray-100"></div>
-        <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mt-2"></div>
-      </div>
-    `).join('');
-
-    if (catGrid) catGrid.innerHTML = skeletonHTML;
-    if (colGrid) colGrid.innerHTML = skeletonHTML;
-
     try {
       const { data: categoriesData, error: catError } = await supabase
         .from('categories')
@@ -279,7 +266,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View (Upgraded UI with Loaders)
+  // 4. Primary Category Drilldown View
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -288,32 +275,6 @@ import { supabase } from './supabaseClient.js';
     const categoryTitle = document.getElementById('current-category-title');
 
     if (categoryTitle) categoryTitle.textContent = categoryName;
-
-    // Instantly switch views and show product skeletons
-    if (categoriesSection && productSection) {
-      categoriesSection.classList.add('hidden');
-      if (collectionsSection) collectionsSection.classList.add('hidden');
-      productSection.classList.remove('hidden');
-      setTimeout(() => {
-        productSection.classList.remove('opacity-0');
-      }, 10);
-    }
-
-    if (productGrid) {
-      productGrid.innerHTML = Array(6).fill(`
-        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
-            <div class="w-full aspect-[4/5] bg-gray-200 rounded-t-[2rem]"></div>
-            <div class="p-5 flex flex-col flex-grow border-t border-gray-50 bg-white">
-                <div class="flex justify-between items-start mb-1 gap-2">
-                    <div class="h-5 bg-gray-200 rounded w-2/3"></div>
-                    <div class="h-5 bg-gray-200 rounded w-1/4"></div>
-                </div>
-                <div class="h-3 bg-gray-200 rounded w-1/3 mb-5 mt-2"></div>
-                <div class="mt-auto w-full h-12 bg-gray-200 rounded-xl"></div>
-            </div>
-        </div>
-      `).join('');
-    }
 
     let categoryProds = [];
     try {
@@ -395,6 +356,16 @@ import { supabase } from './supabaseClient.js';
         }).join('');
       }
     }
+
+    if (categoriesSection && productSection) {
+      categoriesSection.classList.add('hidden');
+      if (collectionsSection) collectionsSection.classList.add('hidden');
+      productSection.classList.remove('hidden');
+      setTimeout(() => {
+        productSection.classList.remove('opacity-0');
+        productSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 10);
+    }
   }
 
   function hideProducts() {
@@ -412,7 +383,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 5. Quick-View Modal Functions (Upgraded Amazon UI & Fullscreen Gallery)
+  // 5. Quick-View Modal Functions
   function openProductModal(productId) {
     const prod = products.find(p => String(p.id) === String(productId));
     if (!prod) return;
@@ -463,13 +434,11 @@ import { supabase } from './supabaseClient.js';
       }
     }
 
-    // Modal Track Injection with Fullscreen Gallery Click Target
     const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
-      const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
-      modalSwipeTrack.innerHTML = images.map((img, index) => `
+      modalSwipeTrack.innerHTML = images.map(img => `
           <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
-              <img src="${img}" onclick="openFullscreenGallery(${escapedImages}, ${index})" class="w-full h-full object-contain cursor-zoom-in active:opacity-75 transition-opacity" title="Tap to expand">
+              <img src="${img}" class="w-full h-full object-contain">
           </div>
       `).join('');
       modalSwipeTrack.scrollLeft = 0;
@@ -485,7 +454,6 @@ import { supabase } from './supabaseClient.js';
         : '<li>No specifications listed.</li>';
     }
 
-    // Amazon-Style Thumbnail Generation
     if (thumbsContainer) {
       thumbsContainer.innerHTML = images.map((img, index) => `
         <div onclick="changeModalImage(${index})" class="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-pink-500 cursor-pointer bg-white transition-all p-1">
@@ -517,9 +485,15 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 6. Contact Form Inquiry Submission
+  // 6. Contact Form Inquiry Submission (Restricted to Signed-In Users)
   async function handleContactSubmit(event) {
     event.preventDefault();
+
+    if (!currentUser) {
+      alert('You must be logged in to send an inquiry. Please log in first.');
+      window.location.href = 'login.html';
+      return;
+    }
 
     const nameInput = document.getElementById('contact-name');
     const emailInput = document.getElementById('contact-email');
@@ -546,7 +520,12 @@ import { supabase } from './supabaseClient.js';
     try {
       const { error } = await supabase
         .from('inquiries')
-        .insert([{ name, email, message }]);
+        .insert([{ 
+          name, 
+          email, 
+          message,
+          user_id: currentUser.id 
+        }]);
 
       if (error) throw error;
 
@@ -608,58 +587,7 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 8. Fullscreen Gallery Logic
-  function openFullscreenGallery(images, startIndex) {
-    const gallery = document.getElementById('fullscreen-gallery');
-    const track = document.getElementById('gallery-swipe-track');
-    if (!gallery || !track) return;
-
-    track.innerHTML = images.map((img) => `
-        <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4 md:p-12">
-            <img src="${img}" class="max-w-full max-h-full object-contain select-none">
-        </div>
-    `).join('');
-
-    gallery.classList.remove('hidden');
-    gallery.classList.add('flex');
-    
-    setTimeout(() => {
-        gallery.classList.remove('opacity-0');
-        
-        const width = track.clientWidth;
-        track.scrollTo({ left: startIndex * width, behavior: 'instant' });
-        updateGalleryCounter(startIndex, images.length);
-    }, 10);
-
-    track.onscroll = () => {
-        const activeIndex = Math.round(track.scrollLeft / track.clientWidth);
-        updateGalleryCounter(activeIndex, images.length);
-    };
-  }
-
-  function updateGalleryCounter(index, total) {
-      const counter = document.getElementById('gallery-counter');
-      if (counter) counter.innerText = `${index + 1} / ${total}`;
-  }
-
-  function closeFullscreenGallery() {
-      const gallery = document.getElementById('fullscreen-gallery');
-      if (!gallery) return;
-      gallery.classList.add('opacity-0');
-      setTimeout(() => {
-          gallery.classList.add('hidden');
-          gallery.classList.remove('flex');
-      }, 300);
-  }
-
-  function scrollGallerySlider(direction) {
-      const track = document.getElementById('gallery-swipe-track');
-      if (track) {
-          const width = track.clientWidth;
-          track.scrollBy({ left: direction * width, behavior: 'smooth' });
-      }
-  }
-// 11. Cutest Pepes Dynamic Interactive Showcase
+  // 8. Cutest Pepes Interactive Dynamic Showcase Loader
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
@@ -671,6 +599,13 @@ import { supabase } from './supabaseClient.js';
         .limit(6);
 
       if (!promoProducts || promoProducts.length === 0) return;
+
+      // Also ensure these products are added to global products array so modal finds them
+      promoProducts.forEach(p => {
+        if (!products.some(existing => existing.id === p.id)) {
+          products.push(p);
+        }
+      });
 
       const cardsHTML = promoProducts.map(prod => {
         let imagesArr = [];
@@ -694,6 +629,7 @@ import { supabase } from './supabaseClient.js';
       console.error('Error loading Cutest Pepes showcase:', err);
     }
   }
+
   // 9. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
@@ -706,14 +642,13 @@ import { supabase } from './supabaseClient.js';
   window.scrollProductSlider = scrollProductSlider;
   window.scrollModalSlider = scrollModalSlider;
   window.changeModalImage = changeModalImage;
-  window.openFullscreenGallery = openFullscreenGallery;
-  window.closeFullscreenGallery = closeFullscreenGallery;
-  window.scrollGallerySlider = scrollGallerySlider;
+  window.loadCutestPepesShowcase = loadCutestPepesShowcase;
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => {
     checkUserSession();
     loadCategoriesAndCollections();
+    loadCutestPepesShowcase();
 
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
