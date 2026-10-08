@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PEPE KUN | Discover Softness</title>
-    <!-- Fixes the favicon 404 error -->
     <link rel="icon" href="1pepe-logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,31 +15,15 @@
                 theme: {
                     extend: {
                         fontFamily: { sans: ['Outfit', 'sans-serif'] },
-                        colors: { brand: { 50: '#fdfbf7', 900: '#1a1a1a' } },
-                        keyframes: {
-                            float: {
-                                '0%, 100%': { transform: 'translateY(0)' },
-                                '50%': { transform: 'translateY(-10px)' },
-                            }
-                        },
-                        animation: {
-                            float: 'float 6s ease-in-out infinite',
-                        }
+                        colors: { brand: { 50: '#fdfbf7', 900: '#1a1a1a' } }
                     }
                 }
             };
         }
     </script>
     <style>
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .bg-section-1 {
             background-image: url('spinning2.png');
             background-size: cover;
@@ -48,7 +31,6 @@
             background-repeat: no-repeat;
             background-attachment: scroll;
         }
-
         .bg-section-2 {
             background-image: url('spinning1.png');
             background-size: cover;
@@ -56,27 +38,19 @@
             background-repeat: no-repeat;
             background-attachment: scroll;
         }
-
         @media (min-width: 768px) {
-            .bg-section-1,
-            .bg-section-2 {
-                background-attachment: fixed;
-            }
+            .bg-section-1, .bg-section-2 { background-attachment: fixed; }
         }
         @keyframes marquee {
             0% { transform: translateX(0%); }
             100% { transform: translateX(-50%); }
         }
-
         .animate-marquee {
             display: flex;
             width: max-content;
             animation: marquee 25s linear infinite;
         }
-
-        .animate-marquee:hover {
-            animation-play-state: paused;
-        }
+        .animate-marquee:hover { animation-play-state: paused; }
     </style>
 </head>
 
@@ -85,55 +59,33 @@
     <!-- FLOATING NAVBAR -->
     <nav class="fixed top-4 left-0 right-0 z-50 w-[95%] max-w-6xl mx-auto bg-white/50 backdrop-blur-sm border border-white/50 px-6 py-4 shadow-lg rounded-3xl transition-all duration-300">
         <div class="flex items-center justify-between">
-
             <a href="#home" class="flex items-center ml-2">
                 <img src="1pepe-logo.png" alt="PEPE KUN Logo" class="h-10 md:h-12 w-auto object-contain">
             </a>
-
-            <!-- Desktop Links -->
             <div class="hidden md:flex gap-8 text-sm font-medium items-center absolute left-1/2 -translate-x-1/2">
                 <a href="#home" class="hover:text-pink-500 transition-colors">Home</a>
                 <a href="#about" class="hover:text-pink-500 transition-colors">About Us</a>
                 <a href="#contact" class="hover:text-pink-500 transition-colors">Contact</a>
             </div>
-
-            <!-- Desktop Actions -->
             <div class="hidden md:flex gap-4 text-sm font-medium items-center mr-2">
-                <button onclick="window.location.href='cart.html'"
-                    class="hover:text-pink-500 transition-colors flex items-center gap-1 relative">
+                <button onclick="window.location.href='cart.html'" class="hover:text-pink-500 transition-colors flex items-center gap-1 relative">
                     Cart
-                    <span id="cart-count"
-                        class="bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full font-bold ml-1">0</span>
+                    <span id="cart-count" class="bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full font-bold ml-1">0</span>
                 </button>
-                <a href="login.html" id="auth-login-btn"
-                    class="bg-brand-900 text-white px-6 py-2 rounded-full hover:bg-pink-500 transition-colors shadow-md text-center min-w-[100px]">Log
-                    In</a>
+                <a href="login.html" id="auth-login-btn" class="bg-brand-900 text-white px-6 py-2 rounded-full hover:bg-pink-500 transition-colors shadow-md text-center min-w-[100px]">Log In</a>
             </div>
-
-            <!-- Mobile Hamburger Button -->
-            <button onclick="toggleMobileMenu()"
-                class="md:hidden p-2 text-gray-600 hover:text-pink-500 focus:outline-none transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
-                </svg>
+            <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-600 hover:text-pink-500 focus:outline-none transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
-
-        <!-- Mobile Dropdown Menu -->
-        <div id="mobile-menu"
-            class="hidden flex-col gap-4 pt-6 pb-4 border-t border-gray-200 mt-4 text-center text-base font-medium md:hidden animate-[fadeIn_0.2s_ease-in]">
+        <div id="mobile-menu" class="hidden flex-col gap-4 pt-6 pb-4 border-t border-gray-200 mt-4 text-center text-base font-medium md:hidden">
             <a href="#home" onclick="toggleMobileMenu()" class="hover:text-pink-500 transition-colors">Home</a>
             <a href="#about" onclick="toggleMobileMenu()" class="hover:text-pink-500 transition-colors">About Us</a>
             <a href="#contact" onclick="toggleMobileMenu()" class="hover:text-pink-500 transition-colors">Contact</a>
-            <a href="cart.html"
-                class="hover:text-pink-500 transition-colors py-2 flex items-center justify-center gap-2">
-                Cart <span id="cart-count-mobile"
-                    class="bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+            <a href="cart.html" class="hover:text-pink-500 transition-colors py-2 flex items-center justify-center gap-2">
+                Cart <span id="cart-count-mobile" class="bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
             </a>
-            <a href="login.html" id="mobile-auth-btn"
-                class="bg-brand-900 text-white px-6 py-3 rounded-full mx-auto inline-block w-[80%] max-w-[200px] mt-2 shadow-sm">Log
-                In</a>
+            <a href="login.html" id="mobile-auth-btn" class="bg-brand-900 text-white px-6 py-3 rounded-full mx-auto inline-block w-[80%] max-w-[200px] mt-2 shadow-sm">Log In</a>
         </div>
     </nav>
 
@@ -142,12 +94,8 @@
         <div class="absolute inset-0 bg-white/50 backdrop-blur-sm z-0 pointer-events-none"></div>
 
         <div class="relative z-10 pt-24 md:pt-28 pb-16">
-
-            <!-- BANNER -->
-            <header id="home"
-                class="relative w-full max-w-7xl mx-auto px-4 md:px-6 rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-transparent flex justify-center">
-                <img id="banner-slider" src="banner.png" class="w-full h-auto object-contain transition-opacity duration-500 shadow-lg rounded-[2rem] md:rounded-[3rem]"
-                    alt="Pepe Kun Banner">
+            <header id="home" class="relative w-full max-w-7xl mx-auto px-4 md:px-6 rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-transparent flex justify-center">
+                <img id="banner-slider" src="banner.png" class="w-full h-auto object-contain transition-opacity duration-500 shadow-lg rounded-[2rem] md:rounded-[3rem]" alt="Pepe Kun Banner">
             </header>
 
             <!-- MAIN CATEGORIES -->
@@ -156,47 +104,35 @@
                     <h2 class="text-2xl md:text-3xl font-medium tracking-wide text-gray-900">Choose Your Companion</h2>
                 </div>
                 <div class="relative">
-                    <button type="button" data-arrow="left" onclick="scrollCategoryRow('category-grid', -1)" aria-label="Scroll left"
-                        class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">‹</button>
-                    <div id="category-grid" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 no-scrollbar py-4 px-2 scroll-pl-2 overscroll-x-contain">
-                        <!-- Dynamic categories go here -->
-                    </div>
-                    <button type="button" data-arrow="right" onclick="scrollCategoryRow('category-grid', 1)" aria-label="Scroll right"
-                        class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">›</button>
+                    <button type="button" data-arrow="left" onclick="scrollCategoryRow('category-grid', -1)" class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">‹</button>
+                    <div id="category-grid" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 no-scrollbar py-4 px-2 scroll-pl-2 overscroll-x-contain"></div>
+                    <button type="button" data-arrow="right" onclick="scrollCategoryRow('category-grid', 1)" class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">›</button>
                 </div>
             </section>
-            <!-- CUTEST PEPES INTERACTIVE SLIDING SHOWCASE -->
-    <section class="py-16 md:py-20 overflow-hidden w-full relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 mb-10 text-center">
-            <span class="inline-block bg-pink-100 text-pink-600 text-xs font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full border border-pink-200 shadow-sm">Our Favorites</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mt-3 tracking-tight">Cutest Pepes</h2>
-            <p class="text-gray-500 text-sm md:text-base mt-2">Tap any adorable companion to view details and shop</p>
-        </div>
 
-        <div class="relative w-full overflow-hidden py-4">
-            <!-- Left & Right Fade Gradients -->
-            <div class="absolute left-0 inset-y-0 w-24 md:w-48 bg-gradient-to-r from-[#F4E8FA] to-transparent z-10 pointer-events-none"></div>
-            <div class="absolute right-0 inset-y-0 w-24 md:w-48 bg-gradient-to-l from-[#F4E8FA] to-transparent z-10 pointer-events-none"></div>
+            <!-- CUTEST PEPES SLIDING SHOWCASE -->
+            <section class="py-16 md:py-20 overflow-hidden w-full relative">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 mb-10 text-center">
+                    <span class="inline-block bg-pink-100 text-pink-600 text-xs font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full border border-pink-200 shadow-sm">Our Favorites</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mt-3 tracking-tight">Cutest Pepes</h2>
+                    <p class="text-gray-500 text-sm md:text-base mt-2">Tap any adorable companion to view full photos</p>
+                </div>
+                <div class="relative w-full overflow-hidden py-4">
+                    <div class="absolute left-0 inset-y-0 w-24 md:w-48 bg-gradient-to-r from-[#F4E8FA] to-transparent z-10 pointer-events-none"></div>
+                    <div class="absolute right-0 inset-y-0 w-24 md:w-48 bg-gradient-to-l from-[#F4E8FA] to-transparent z-10 pointer-events-none"></div>
+                    <div id="cutest-pepes-track" class="flex gap-8 animate-marquee w-max cursor-default items-center"></div>
+                </div>
+            </section>
 
-            <!-- Dynamic Track -->
-            <div id="cutest-pepes-track" class="flex gap-8 animate-marquee w-max cursor-default items-center">
-                <!-- Dynamically populated via script.js -->
-            </div>
-        </div>
-    </section>
-            <!-- SUB CATEGORIES / COLLECTIONS -->
+            <!-- CURATED COLLECTIONS -->
             <section id="collections-section" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
                 <div class="text-center mb-6">
                     <h2 class="text-xl md:text-2xl font-semibold tracking-wide text-gray-900">Curated Collections</h2>
                 </div>
                 <div class="relative">
-                    <button type="button" data-arrow="left" onclick="scrollCategoryRow('collection-grid', -1)" aria-label="Scroll left"
-                        class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">‹</button>
-                    <div id="collection-grid" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 no-scrollbar py-4 px-2 scroll-pl-2 overscroll-x-contain">
-                        <!-- Dynamic categories go here -->
-                    </div>
-                    <button type="button" data-arrow="right" onclick="scrollCategoryRow('collection-grid', 1)" aria-label="Scroll right"
-                        class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">›</button>
+                    <button type="button" data-arrow="left" onclick="scrollCategoryRow('collection-grid', -1)" class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">‹</button>
+                    <div id="collection-grid" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 no-scrollbar py-4 px-2 scroll-pl-2 overscroll-x-contain"></div>
+                    <button type="button" data-arrow="right" onclick="scrollCategoryRow('collection-grid', 1)" class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:text-pink-500 transition-colors">›</button>
                 </div>
             </section>
 
@@ -204,57 +140,20 @@
             <section id="product-display" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-24 hidden opacity-0 transition-opacity duration-500">
                 <div class="flex items-center justify-between mb-8 md:mb-10 border-b border-gray-300 pb-4">
                     <h2 id="current-category-title" class="text-xl md:text-2xl font-semibold text-gray-900">Products</h2>
-                    <button onclick="hideProducts()" class="text-xs md:text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors border border-gray-300 rounded-full px-4 md:px-5 py-2 bg-white/80 backdrop-blur hover:bg-white shadow-sm">
-                        ← Back
-                    </button>
+                    <button onclick="hideProducts()" class="text-xs md:text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors border border-gray-300 rounded-full px-4 md:px-5 py-2 bg-white/80 backdrop-blur hover:bg-white shadow-sm">← Back</button>
                 </div>
-                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-                    <!-- Products rendered dynamically -->
-                </div>
+                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8"></div>
             </section>
-
         </div>
     </div>
-
-    <!-- 3-CARD SHOWCASE SECTION -->
-    <section class="bg-section-1 relative overflow-hidden py-24 flex flex-col justify-center items-center w-full">
-        <div class="absolute inset-0 bg-white/50 backdrop-blur-sm z-0 pointer-events-none"></div>
-
-        <div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center mt-8">
-            <!-- Left Card -->
-            <div class="relative w-full aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-xl border border-white/50 bg-white">
-                <img id="card-left-img" src="1.png" class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Left">
-                <div class="absolute bottom-5 left-5 right-5 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
-                    <div id="progress-left" class="h-full bg-white/90 w-0 rounded-full"></div>
-                </div>
-            </div>
-            <!-- Center Card -->
-            <div class="relative w-full aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/50 bg-white md:scale-105 z-10">
-                <img id="card-center-img" src="4.png" class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Center">
-                <div class="absolute bottom-5 left-5 right-5 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
-                    <div id="progress-center" class="h-full bg-white/90 w-0 rounded-full"></div>
-                </div>
-            </div>
-            <!-- Right Card -->
-            <div class="relative w-full aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-xl border border-white/50 bg-white">
-                <img id="card-right-img" src="7.png" class="w-full h-full object-cover transition-opacity duration-500" alt="Showcase Right">
-                <div class="absolute bottom-5 left-5 right-5 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
-                    <div id="progress-right" class="h-full bg-white/90 w-0 rounded-full"></div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- ABOUT US SECTION -->
     <section id="about" class="bg-section-2 relative overflow-hidden py-16 md:py-24 border border-gray-200 shadow-sm">
         <div class="absolute inset-0 bg-white/50 backdrop-blur-sm z-0 pointer-events-none"></div>
-
         <div class="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <div class="text-center md:text-left">
                 <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-gray-900">More Than Just Toys.</h2>
-                <p class="text-gray-700 mb-6 leading-relaxed font-medium text-lg">At Pepe Kun, every plushie is designed
-                    with a personality. From our sleepy cats to our signature bamboo pandas, we focus on premium
-                    materials, unique branding, and unparalleled softness.</p>
+                <p class="text-gray-700 mb-6 leading-relaxed font-medium text-lg">At Pepe Kun, every plushie is designed with a personality. From our sleepy cats to our signature bamboo pandas, we focus on premium materials, unique branding, and unparalleled softness.</p>
             </div>
             <div class="h-[300px] md:h-[450px] rounded-[2rem] overflow-hidden border border-white/50 shadow-lg">
                 <img src="11.png" class="w-full h-full object-cover" alt="About Pepe Kun">
@@ -262,24 +161,18 @@
         </div>
     </section>
 
-<!-- CONTACT / ENQUIRY SECTION -->
+    <!-- CONTACT / ENQUIRY SECTION -->
     <section id="contact" class="bg-section-1 relative py-20 md:py-28 w-full">
         <div class="absolute inset-0 bg-white/60 backdrop-blur-md z-0 pointer-events-none"></div>
-
         <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
             <div class="bg-white/95 backdrop-blur-xl rounded-[3rem] border border-pink-100 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-                
-                <!-- Left Panel: Brand Info (Rich Pastel Rose & Purple Gradient) -->
                 <div class="lg:col-span-5 bg-gradient-to-br from-purple-950 via-purple-900 to-pink-900 text-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden">
                     <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="relative z-10">
                         <span class="inline-block bg-pink-500/30 text-pink-200 text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full mb-4 border border-pink-400/30 shadow-sm">Customer Care</span>
                         <h2 class="text-3xl md:text-4xl font-bold mb-4 tracking-tight">We'd Love to Hear From You</h2>
-                        <p class="text-pink-100/80 text-sm md:text-base leading-relaxed mb-8">
-                            Have questions about our sleepy plushies, order tracking, or custom support? Reach out and our team will reply within 24 hours.
-                        </p>
+                        <p class="text-pink-100/80 text-sm md:text-base leading-relaxed mb-8">Have questions about our sleepy plushies, order tracking, or custom support? Reach out and our team will reply within 24 hours.</p>
                     </div>
-
                     <div class="space-y-5 pt-6 border-t border-white/15 text-sm relative z-10">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-pink-300 font-bold shrink-0 border border-white/10">✉</div>
@@ -288,74 +181,42 @@
                                 <p class="font-medium text-white">support@pepekun.com</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-pink-300 font-bold shrink-0 border border-white/10">🕒</div>
-                            <div>
-                                <p class="text-[11px] text-pink-300 uppercase tracking-wider font-semibold">Working Hours</p>
-                                <p class="font-medium text-white">Mon – Fri: 10:00 AM – 7:00 PM</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
-
-                <!-- Right Panel: Interactive Form -->
                 <div class="lg:col-span-7 p-8 md:p-12 flex flex-col justify-center bg-white">
                     <h3 class="text-2xl font-bold text-gray-900 mb-2">Send an Enquiry</h3>
                     <p class="text-gray-500 text-sm mb-8">Please note: You must be logged in to send queries.</p>
-
                     <form id="contact-form" class="space-y-5 text-left">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Your Name</label>
-                                <input id="contact-name" name="name" type="text" placeholder="e.g. Alex Smith"
-                                    class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 bg-gray-50/50 text-sm transition-all"
-                                    required>
+                                <input id="contact-name" name="name" type="text" placeholder="e.g. Alex Smith" class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-500 bg-gray-50/50 text-sm transition-all" required>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Email Address</label>
-                                <input id="contact-email" name="email" type="email" placeholder="alex@example.com"
-                                    class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 bg-gray-50/50 text-sm transition-all"
-                                    required>
+                                <input id="contact-email" name="email" type="email" placeholder="alex@example.com" class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-500 bg-gray-50/50 text-sm transition-all" required>
                             </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Your Message</label>
-                            <textarea id="contact-message" name="message" rows="4" placeholder="How can we help you today?"
-                                class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 bg-gray-50/50 text-sm transition-all resize-none"
-                                required></textarea>
+                            <textarea id="contact-message" name="message" rows="4" placeholder="How can we help you today?" class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:border-pink-500 bg-gray-50/50 text-sm transition-all resize-none" required></textarea>
                         </div>
-                        <button id="contact-submit-btn" type="submit"
-                            class="w-full py-4 bg-brand-900 text-white rounded-2xl font-semibold hover:bg-pink-500 transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2">
+                        <button id="contact-submit-btn" type="submit" class="w-full py-4 bg-brand-900 text-white rounded-2xl font-semibold hover:bg-pink-500 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2">
                             <span>Send Message</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
     </section>
-<!-- PROFESSIONAL FOOTER SECTION -->
+
+    <!-- PROFESSIONAL FOOTER SECTION -->
     <footer class="bg-gradient-to-b from-[#F4E8FA] to-[#ebd7f5] text-brand-900 pt-16 pb-12 mt-20 border-t border-purple-200/60 shadow-inner">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
-            
-            <!-- Brand & Bio with Logo -->
             <div class="space-y-4">
                 <img src="1pepe-logo.png" alt="PEPE KUN Logo" class="h-12 w-auto object-contain">
-                <p class="text-gray-600 text-sm leading-relaxed">
-                    Discover unparalleled softness with Pepe Kun. Premium plushies designed with personality, crafted with love.
-                </p>
-                <div class="flex gap-3 pt-2">
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white hover:bg-pink-500 hover:text-white flex items-center justify-center transition-all text-gray-800 shadow-sm border border-purple-100 hover:scale-105" aria-label="Instagram">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    </a>
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white hover:bg-pink-500 hover:text-white flex items-center justify-center transition-all text-gray-800 shadow-sm border border-purple-100 hover:scale-105" aria-label="Facebook">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.37 14.5 5 15.5 5H18V0h-3.808C10.59 0 9 1.581 9 4.75V8z"/></svg>
-                    </a>
-                </div>
+                <p class="text-gray-600 text-sm leading-relaxed">Discover unparalleled softness with Pepe Kun. Premium plushies designed with personality, crafted with love.</p>
             </div>
-
-            <!-- Quick Links -->
             <div>
                 <h4 class="text-xs font-bold uppercase tracking-wider text-pink-600 mb-4">Quick Links</h4>
                 <ul class="space-y-2.5 text-sm text-gray-600">
@@ -365,8 +226,6 @@
                     <li><a href="#contact" class="hover:text-pink-600 transition-colors">Contact Support</a></li>
                 </ul>
             </div>
-
-            <!-- PhonePe Policy Compliance Links -->
             <div>
                 <h4 class="text-xs font-bold uppercase tracking-wider text-pink-600 mb-4">Policies & Compliance</h4>
                 <ul class="space-y-2.5 text-sm text-gray-600">
@@ -377,72 +236,32 @@
                     <li><a href="contact-policy.html" class="hover:text-pink-600 transition-colors">Contact Us Policy</a></li>
                 </ul>
             </div>
-
         </div>
-
         <div class="max-w-7xl mx-auto px-6 border-t border-purple-200/60 pt-8 text-center text-gray-500 text-xs font-medium">
             &copy; 2026 PEPE KUN. All rights reserved. Secured & Verified for Digital Payments.
         </div>
     </footer>
+
     <!-- PRODUCT QUICK-VIEW MODAL -->
-    <div id="product-modal"
-        class="fixed inset-0 z-[100] hidden items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
+    <div id="product-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-pointer" onclick="closeModal()"></div>
         <div class="relative w-full max-w-5xl bg-white rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
-
-            <button onclick="closeModal()"
-                class="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur border border-gray-200 p-2 rounded-full hover:bg-gray-100 text-gray-800 transition-transform">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur border border-gray-200 p-2 rounded-full hover:bg-gray-100 text-gray-800 transition-transform">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-
-            <!-- Image Track & Thumbnails Area -->
             <div class="md:w-1/2 p-6 bg-gray-50 flex flex-col gap-4 overflow-y-auto border-r border-gray-100">
-                <div class="relative w-full aspect-square rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-sm group/modal-slider">
-                    <!-- Swipeable Track container -->
+                <div class="relative w-full aspect-square rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-sm">
                     <div id="modal-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x"></div>
-
-                    <!-- Desktop Navigation Arrows -->
-                    <button onclick="scrollModalSlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover/modal-slider:opacity-100 transition-all shadow-md z-30 pb-1 text-2xl leading-none cursor-pointer">‹</button>
-                    <button onclick="scrollModalSlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover/modal-slider:opacity-100 transition-all shadow-md z-30 pb-1 text-2xl leading-none cursor-pointer">›</button>
                 </div>
-
                 <div class="grid grid-cols-4 gap-3 mt-2" id="modal-thumbnails"></div>
             </div>
-
-            <!-- Details Area -->
             <div class="md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
-                <div class="text-[11px] text-gray-500 font-bold tracking-widest uppercase mb-2" id="modal-category">
-                </div>
+                <div class="text-[11px] text-gray-500 font-bold tracking-widest uppercase mb-2" id="modal-category"></div>
                 <h2 class="text-3xl md:text-4xl font-semibold text-gray-900 mb-2" id="modal-title"></h2>
                 <div class="text-xl font-medium text-gray-600 mb-6" id="modal-price"></div>
-
-                <!-- DYNAMIC COLOR SELECTION -->
-                <div id="modal-colors-container" class="mb-6 hidden">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Select Color <span class="text-pink-500">*</span></label>
-                    <div id="modal-color-options" class="flex items-center gap-2 flex-wrap"></div>
-                </div>
-
-                <div class="flex gap-6 border-b border-gray-200 mb-6">
-                    <button onclick="switchTab('desc')" id="tab-btn-desc"
-                        class="pb-2 font-medium text-gray-900 border-b-2 border-gray-900">Description</button>
-                    <button onclick="switchTab('specs')" id="tab-btn-specs"
-                        class="pb-2 font-medium text-gray-400 hover:text-gray-900 border-b-2 border-transparent">Specifications</button>
-                </div>
-
-                <div id="tab-desc" class="text-gray-600 mb-6 leading-relaxed text-sm md:text-base block"></div>
-                <div id="tab-specs" class="hidden">
-                    <ul class="text-gray-600 space-y-2 text-sm list-disc pl-5" id="modal-specs-list"></ul>
-                </div>
-
                 <div class="mt-auto flex gap-4 pt-8">
-                    <button id="modal-add-cart-btn"
-                        class="flex-1 bg-white border border-gray-300 text-gray-800 py-4 rounded-full font-medium hover:border-gray-900 transition-colors shadow-sm">Add
-                        to Cart</button>
-                    <button id="modal-buy-now-btn" onclick="window.location.href='cart.html'"
-                        class="flex-1 bg-brand-900 text-white py-4 rounded-full font-medium hover:bg-pink-500 transition-colors shadow-md">Buy
-                        Now</button>
+                    <button id="modal-add-cart-btn" class="flex-1 bg-white border border-gray-300 text-gray-800 py-4 rounded-full font-medium hover:border-gray-900 transition-colors shadow-sm">Add to Cart</button>
+                    <button id="modal-buy-now-btn" onclick="window.location.href='cart.html'" class="flex-1 bg-brand-900 text-white py-4 rounded-full font-medium hover:bg-pink-500 transition-colors shadow-md">Buy Now</button>
                 </div>
             </div>
         </div>
@@ -454,125 +273,17 @@
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         <div id="gallery-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative touch-pan-x items-center"></div>
-        
         <button onclick="scrollGallerySlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">‹</button>
         <button onclick="scrollGallerySlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">›</button>
-        
         <div id="gallery-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-medium tracking-widest text-sm z-50 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur"></div>
     </div>
 
     <script>
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
-            if (menu) {
-                menu.classList.toggle('hidden');
-                menu.classList.toggle('flex');
-            }
+            if (menu) { menu.classList.toggle('hidden'); menu.classList.toggle('flex'); }
         }
-
-        const bannerImgElement = document.getElementById('banner-slider');
-        const bannerPhotos = [
-            bannerImgElement ? bannerImgElement.src : '',
-            'banner2.png',
-            'banner3.png'
-        ];
-        let bannerIndex = 0;
-
-        setInterval(() => {
-            if (bannerImgElement && bannerPhotos.length > 1) {
-                bannerImgElement.classList.add('opacity-0');
-                setTimeout(() => {
-                    bannerIndex = (bannerIndex + 1) % bannerPhotos.length;
-                    if (bannerPhotos[bannerIndex]) {
-                        bannerImgElement.src = bannerPhotos[bannerIndex];
-                    }
-                    bannerImgElement.classList.remove('opacity-0');
-                }, 500);
-            }
-        }, 4000);
-
-        function switchTab(tab) {
-            const tabDesc = document.getElementById('tab-desc');
-            const tabSpecs = document.getElementById('tab-specs');
-            const btnDesc = document.getElementById('tab-btn-desc');
-            const btnSpecs = document.getElementById('tab-btn-specs');
-
-            if (tab === 'desc') {
-                tabDesc.classList.remove('hidden');
-                tabSpecs.classList.add('hidden');
-                btnDesc.className = "pb-2 font-medium text-gray-900 border-b-2 border-gray-900";
-                btnSpecs.className = "pb-2 font-medium text-gray-400 hover:text-gray-900 border-b-2 border-transparent transition-colors";
-            } else {
-                tabSpecs.classList.remove('hidden');
-                tabDesc.classList.add('hidden');
-                btnSpecs.className = "pb-2 font-medium text-gray-900 border-b-2 border-gray-900";
-                btnDesc.className = "pb-2 font-medium text-gray-400 hover:text-gray-900 border-b-2 border-transparent transition-colors";
-            }
-        }
-
-        const leftImages = ['2.png', '3.png'];
-        const rightImages = ['5.png', '6.png'];
-        const centerImages = ['8.png', '9.png'];
-
-        let indices = { left: 0, center: 0, right: 0 };
-        const leftImgEl = document.getElementById('card-left-img');
-        const centerImgEl = document.getElementById('card-center-img');
-        const rightImgEl = document.getElementById('card-right-img');
-
-        const progLeft = document.getElementById('progress-left');
-        const progCenter = document.getElementById('progress-center');
-        const progRight = document.getElementById('progress-right');
-
-        function startProgress(el, duration) {
-            if (!el) return;
-            el.style.transition = 'none';
-            el.style.width = '0%';
-            void el.offsetWidth;
-            el.style.transition = `width ${duration}ms linear`;
-            el.style.width = '100%';
-        }
-
-        function updateCardImage(imgEl, progEl, imgArray, key, duration) {
-            if (!imgEl) return;
-            imgEl.classList.add('opacity-0');
-            setTimeout(() => {
-                indices[key] = (indices[key] + 1) % imgArray.length;
-                imgEl.src = imgArray[indices[key]];
-                imgEl.classList.remove('opacity-0');
-                startProgress(progEl, duration);
-            }, 500); 
-        }
-
-        setTimeout(() => {
-            startProgress(progLeft, 4000);
-            startProgress(progRight, 4000);
-            startProgress(progCenter, 6000);
-        }, 100);
-
-        setInterval(() => {
-            updateCardImage(leftImgEl, progLeft, leftImages, 'left', 4000);
-            updateCardImage(rightImgEl, progRight, rightImages, 'right', 4000);
-        }, 4000);
-
-        setInterval(() => {
-            updateCardImage(centerImgEl, progCenter, centerImages, 'center', 6000);
-        }, 6000);
     </script>
-
-    <!-- EXTERNAL JS -->
     <script type="module" src="script.js"></script>
-    <!-- FULLSCREEN IMAGE GALLERY OVERLAY -->
-    <div id="fullscreen-gallery" class="fixed inset-0 z-[200] hidden flex-col bg-black/95 opacity-0 transition-opacity duration-300">
-        <button onclick="closeFullscreenGallery()" class="absolute top-4 right-4 z-50 text-white/80 p-4 hover:text-white transition-colors cursor-pointer">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <div id="gallery-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative touch-pan-x items-center"></div>
-        
-        <button onclick="scrollGallerySlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">‹</button>
-        <button onclick="scrollGallerySlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">›</button>
-        
-        <div id="gallery-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-medium tracking-widest text-sm z-50 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur"></div>
-    </div>
 </body>
-
 </html>
