@@ -86,7 +86,6 @@ import { supabase } from './supabaseClient.js';
     localStorage.setItem('pepe_cart', JSON.stringify(cart));
   }
 
-  // Color selection helper
   function selectColor(color, btnElement) {
     selectedColor = color;
     document.querySelectorAll('.color-btn').forEach(btn => {
@@ -266,7 +265,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View (Upgraded UI with Uncropped Swipe Cards)
+  // 4. Primary Category Drilldown View with Swipeable, Uncropped Cards
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -317,7 +316,7 @@ import { supabase } from './supabaseClient.js';
           return `
             <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
                 
-                <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
+                <div class="relative w-full aspect-[4/5] bg-gray-50 overflow-hidden group/slider rounded-t-[2rem]">
                     
                     <div id="slider-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, '${prod.id}')">
                         ${imagesArr.map((img) => `
@@ -385,7 +384,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 5. Quick-View Modal Functions (Upgraded Swipeable Modal)
+  // 5. Quick-View Modal Functions
   function openProductModal(productId) {
     const prod = products.find(p => String(p.id) === String(productId));
     if (!prod) return;
@@ -487,7 +486,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 6. Contact Form Inquiry Submission (Restricted to Signed-In Users)
+  // 6. Contact Form Inquiry Submission
   async function handleContactSubmit(event) {
     event.preventDefault();
 
