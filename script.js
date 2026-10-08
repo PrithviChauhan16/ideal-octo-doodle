@@ -194,8 +194,22 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 3. Category Fetching
+  // 3. Category Fetching with Skeleton Loaders
   async function loadCategoriesAndCollections() {
+    const catGrid = document.getElementById('category-grid');
+    const colGrid = document.getElementById('collection-grid');
+    
+    // Inject loading skeletons instantly
+    const skeletonHTML = Array(5).fill(`
+      <div class="flex-none w-40 md:w-52 snap-start bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-pulse text-center">
+        <div class="w-full aspect-square rounded-2xl bg-gray-200 mb-3 border border-gray-100"></div>
+        <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mt-2"></div>
+      </div>
+    `).join('');
+
+    if (catGrid) catGrid.innerHTML = skeletonHTML;
+    if (colGrid) colGrid.innerHTML = skeletonHTML;
+
     try {
       const { data: categoriesData, error: catError } = await supabase
         .from('categories')
@@ -265,7 +279,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View
+  // 4. Primary Category Drilldown View (Upgraded UI with Loaders)
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -274,6 +288,32 @@ import { supabase } from './supabaseClient.js';
     const categoryTitle = document.getElementById('current-category-title');
 
     if (categoryTitle) categoryTitle.textContent = categoryName;
+
+    // Instantly switch views and show product skeletons
+    if (categoriesSection && productSection) {
+      categoriesSection.classList.add('hidden');
+      if (collectionsSection) collectionsSection.classList.add('hidden');
+      productSection.classList.remove('hidden');
+      setTimeout(() => {
+        productSection.classList.remove('opacity-0');
+      }, 10);
+    }
+
+    if (productGrid) {
+      productGrid.innerHTML = Array(6).fill(`
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
+            <div class="w-full aspect-[4/5] bg-gray-200 rounded-t-[2rem]"></div>
+            <div class="p-5 flex flex-col flex-grow border-t border-gray-50 bg-white">
+                <div class="flex justify-between items-start mb-1 gap-2">
+                    <div class="h-5 bg-gray-200 rounded w-2/3"></div>
+                    <div class="h-5 bg-gray-200 rounded w-1/4"></div>
+                </div>
+                <div class="h-3 bg-gray-200 rounded w-1/3 mb-5 mt-2"></div>
+                <div class="mt-auto w-full h-12 bg-gray-200 rounded-xl"></div>
+            </div>
+        </div>
+      `).join('');
+    }
 
     let categoryProds = [];
     try {
@@ -355,15 +395,6 @@ import { supabase } from './supabaseClient.js';
         }).join('');
       }
     }
-
-    if (categoriesSection && productSection) {
-      categoriesSection.classList.add('hidden');
-      if (collectionsSection) collectionsSection.classList.add('hidden');
-      productSection.classList.remove('hidden');
-      setTimeout(() => {
-        productSection.classList.remove('opacity-0');
-      }, 10);
-    }
   }
 
   function hideProducts() {
@@ -381,7 +412,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 5. Quick-View Modal Functions
+  // 5. Quick-View Modal Functions (Upgraded Amazon UI & Fullscreen Gallery)
   function openProductModal(productId) {
     const prod = products.find(p => String(p.id) === String(productId));
     if (!prod) return;
@@ -432,7 +463,8 @@ import { supabase } from './supabaseClient.js';
       }
     }
 
-const modalSwipeTrack = document.getElementById('modal-swipe-track');
+    // Modal Track Injection with Fullscreen Gallery Click Target
+    const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
       const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
       modalSwipeTrack.innerHTML = images.map((img, index) => `
@@ -440,7 +472,7 @@ const modalSwipeTrack = document.getElementById('modal-swipe-track');
               <img src="${img}" onclick="openFullscreenGallery(${escapedImages}, ${index})" class="w-full h-full object-contain cursor-zoom-in active:opacity-75 transition-opacity" title="Tap to expand">
           </div>
       `).join('');
-      modalSwipeTrack.scrollLeft = 0; 
+      modalSwipeTrack.scrollLeft = 0;
     }
 
     if (title) title.textContent = prod.title;
@@ -453,6 +485,7 @@ const modalSwipeTrack = document.getElementById('modal-swipe-track');
         : '<li>No specifications listed.</li>';
     }
 
+    // Amazon-Style Thumbnail Generation
     if (thumbsContainer) {
       thumbsContainer.innerHTML = images.map((img, index) => `
         <div onclick="changeModalImage(${index})" class="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-pink-500 cursor-pointer bg-white transition-all p-1">
