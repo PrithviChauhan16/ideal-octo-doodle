@@ -141,7 +141,6 @@ import { supabase } from './supabaseClient.js';
         }
 
         const { data: existingItem, error: fetchErr } = await query.maybeSingle();
-
         if (fetchErr) throw fetchErr;
 
         if (existingItem) {
@@ -150,7 +149,6 @@ import { supabase } from './supabaseClient.js';
             .from('cart')
             .update({ quantity: newQty, updated_at: new Date().toISOString() })
             .eq('id', existingItem.id);
-
           if (updateErr) throw updateErr;
         } else {
           const { error: insertErr } = await supabase
@@ -161,7 +159,6 @@ import { supabase } from './supabaseClient.js';
               quantity: 1,
               selected_color: chosenColor || null
             }]);
-
           if (insertErr) throw insertErr;
         }
 
@@ -199,7 +196,6 @@ import { supabase } from './supabaseClient.js';
     const catGrid = document.getElementById('category-grid');
     const colGrid = document.getElementById('collection-grid');
     
-    // Inject grey loading placeholders instantly
     const skeletonHTML = Array(5).fill(`
       <div class="flex-none w-40 md:w-52 snap-start bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-pulse text-center">
         <div class="w-full aspect-square rounded-2xl bg-gray-200 mb-3 border border-gray-100"></div>
@@ -288,7 +284,6 @@ import { supabase } from './supabaseClient.js';
 
     if (categoryTitle) categoryTitle.textContent = categoryName;
 
-    // Show skeletons while loading
     if (productGrid) {
       productGrid.innerHTML = Array(6).fill(`
         <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
@@ -353,7 +348,35 @@ import { supabase } from './supabaseClient.js';
              imagesArr = [prod.images || 'https://via.placeholder.com/300'];
           }
 
-          // CLICK OPENS MODAL (NOT FULLSCREEN)
+          // Dynamically calculate and render discount / crossed-out price
+          let discountPercent = parseFloat(prod.discount || prod.discount_percentage || 0);
+          let priceDisplayHTML = `<p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>`;
+          
+          if (discountPercent > 0) {
+              let originalPrice = parseFloat(prod.price) / (1 - (discountPercent / 100));
+              priceDisplayHTML = `
+                  <div class="flex flex-col items-end">
+                      <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap leading-tight">₹${parseFloat(prod.price).toFixed(2)}</p>
+                      <div class="flex items-center gap-1.5 mt-0.5">
+                          <p class="text-gray-400 text-[11px] md:text-xs line-through">₹${originalPrice.toFixed(2)}</p>
+                          <span class="text-[9px] md:text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-md">${discountPercent}% OFF</span>
+                      </div>
+                  </div>
+              `;
+          } else if (prod.original_price && parseFloat(prod.original_price) > parseFloat(prod.price)) {
+              let originalPrice = parseFloat(prod.original_price);
+              let calculatedDiscount = Math.round(((originalPrice - parseFloat(prod.price)) / originalPrice) * 100);
+              priceDisplayHTML = `
+                  <div class="flex flex-col items-end">
+                      <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap leading-tight">₹${parseFloat(prod.price).toFixed(2)}</p>
+                      <div class="flex items-center gap-1.5 mt-0.5">
+                          <p class="text-gray-400 text-[11px] md:text-xs line-through">₹${originalPrice.toFixed(2)}</p>
+                          <span class="text-[9px] md:text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-md">${calculatedDiscount}% OFF</span>
+                      </div>
+                  </div>
+              `;
+          }
+
           return `
             <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
                 <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
@@ -377,14 +400,14 @@ import { supabase } from './supabaseClient.js';
                 </div>
 
                 <div class="p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
-                    <div class="flex justify-between items-start mb-1 gap-2">
+                    <div class="flex justify-between items-start mb-2 gap-2">
                         <h3 onclick="openProductModal('${prod.id}')" class="font-semibold text-gray-900 cursor-pointer hover:text-pink-500 transition-colors text-base md:text-lg line-clamp-2 leading-tight flex-grow">
                             ${prod.title}
                         </h3>
-                        <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
+                        ${priceDisplayHTML}
                     </div>
                     
-                    <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Premium Plushie'}</p>
+                    <p class="text-gray-400 text-xs md:text-sm mb-5 mt-auto line-clamp-1">${prod.category || 'Premium Plushie'}</p>
                     
                     <button id="btn-${prod.id}" onclick="addToCart('${prod.id}', 'btn-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
                         <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
@@ -464,7 +487,6 @@ import { supabase } from './supabaseClient.js';
       }
     }
 
-    // Modal Swipe Track Injection - ONLY clicking here opens the Fullscreen Gallery
     const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
       const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
@@ -477,8 +499,34 @@ import { supabase } from './supabaseClient.js';
     }
 
     if (title) title.textContent = prod.title;
-    if (price) price.textContent = `₹${parseFloat(prod.price).toFixed(2)}`;
     if (desc) desc.textContent = prod.description || 'No description available.';
+
+    // Dynamically calculate and render discount / crossed-out price in Modal
+    if (price) {
+        let discountPercent = parseFloat(prod.discount || prod.discount_percentage || 0);
+        if (discountPercent > 0) {
+            let originalPrice = parseFloat(prod.price) / (1 - (discountPercent / 100));
+            price.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="text-pink-500 font-bold text-2xl">₹${parseFloat(prod.price).toFixed(2)}</span>
+                    <span class="text-gray-400 text-lg line-through">₹${originalPrice.toFixed(2)}</span>
+                    <span class="text-sm font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-md">${discountPercent}% OFF</span>
+                </div>
+            `;
+        } else if (prod.original_price && parseFloat(prod.original_price) > parseFloat(prod.price)) {
+            let originalPrice = parseFloat(prod.original_price);
+            let calculatedDiscount = Math.round(((originalPrice - parseFloat(prod.price)) / originalPrice) * 100);
+            price.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="text-pink-500 font-bold text-2xl">₹${parseFloat(prod.price).toFixed(2)}</span>
+                    <span class="text-gray-400 text-lg line-through">₹${originalPrice.toFixed(2)}</span>
+                    <span class="text-sm font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-md">${calculatedDiscount}% OFF</span>
+                </div>
+            `;
+        } else {
+            price.innerHTML = `<span class="text-pink-500 font-bold text-2xl">₹${parseFloat(prod.price).toFixed(2)}</span>`;
+        }
+    }
 
     if (specsList) {
       specsList.innerHTML = specs.length > 0
@@ -698,7 +746,35 @@ import { supabase } from './supabaseClient.js';
           imagesArr = [prod.images || '1.png'];
         }
         
-        // CLICK OPENS MODAL (NOT FULLSCREEN)
+        // Dynamically calculate and render discount / crossed-out price
+        let discountPercent = parseFloat(prod.discount || prod.discount_percentage || 0);
+        let priceDisplayHTML = `<p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>`;
+        
+        if (discountPercent > 0) {
+            let originalPrice = parseFloat(prod.price) / (1 - (discountPercent / 100));
+            priceDisplayHTML = `
+                <div class="flex flex-col items-end">
+                    <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap leading-tight">₹${parseFloat(prod.price).toFixed(2)}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <p class="text-gray-400 text-[11px] md:text-xs line-through">₹${originalPrice.toFixed(2)}</p>
+                        <span class="text-[9px] md:text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-md">${discountPercent}% OFF</span>
+                    </div>
+                </div>
+            `;
+        } else if (prod.original_price && parseFloat(prod.original_price) > parseFloat(prod.price)) {
+            let originalPrice = parseFloat(prod.original_price);
+            let calculatedDiscount = Math.round(((originalPrice - parseFloat(prod.price)) / originalPrice) * 100);
+            priceDisplayHTML = `
+                <div class="flex flex-col items-end">
+                    <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap leading-tight">₹${parseFloat(prod.price).toFixed(2)}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <p class="text-gray-400 text-[11px] md:text-xs line-through">₹${originalPrice.toFixed(2)}</p>
+                        <span class="text-[9px] md:text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-md">${calculatedDiscount}% OFF</span>
+                    </div>
+                </div>
+            `;
+        }
+
         return `
           <div class="product-card w-64 md:w-72 flex-shrink-0 bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
               <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
@@ -722,14 +798,14 @@ import { supabase } from './supabaseClient.js';
               </div>
 
               <div class="p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
-                  <div class="flex justify-between items-start mb-1 gap-2">
+                  <div class="flex justify-between items-start mb-2 gap-2">
                       <h3 onclick="openProductModal('${prod.id}')" class="font-semibold text-gray-900 cursor-pointer hover:text-pink-500 transition-colors text-base md:text-lg line-clamp-2 leading-tight flex-grow">
                           ${prod.title}
                       </h3>
-                      <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
+                      ${priceDisplayHTML}
                   </div>
                   
-                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Pepe Special'}</p>
+                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-auto line-clamp-1">${prod.category || 'Pepe Special'}</p>
                   
                   <button id="btn-promo-${prod.id}" onclick="addToCart('${prod.id}', 'btn-promo-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
                       <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
