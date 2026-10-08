@@ -304,26 +304,55 @@ import { supabase } from './supabaseClient.js';
     });
 
     if (productGrid) {
-      if (categoryProds.length === 0) {
+if (categoryProds.length === 0) {
         productGrid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">No products found in this category.</p>`;
       } else {
         productGrid.innerHTML = categoryProds.map(prod => {
           const imagesArr = Array.isArray(prod.images) ? prod.images : JSON.parse(prod.images || '[]');
-          const mainImg = imagesArr[0] || 'https://via.placeholder.com/300';
-
+          
           return `
-            <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-              <div class="cursor-pointer" onclick="openProductModal('${prod.id}')">
-                <div class="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-3 border border-gray-100">
-                  <img src="${mainImg}" alt="${prod.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+            <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
+                
+                <!-- Image Slider Container (Swipeable) -->
+                <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider">
+                    
+                    <!-- Swipeable Track -->
+                    <div class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar" onscroll="updateSliderDots(event, '${prod.id}')">
+                        ${imagesArr.map((img) => `
+                            <div class="min-w-full h-full snap-center p-4 flex-shrink-0 flex items-center justify-center cursor-pointer" onclick="openProductModal('${prod.id}')">
+                                <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain transition-transform duration-700 group-hover/slider:scale-105">
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Bottom Gradient for Dots visibility -->
+                    <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/10 to-transparent pointer-events-none rounded-b-2xl"></div>
+
+                    <!-- Dot Indicators -->
+                    ${imagesArr.length > 1 ? `
+                        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 pointer-events-none z-10" id="dots-${prod.id}">
+                            ${imagesArr.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white scale-125' : 'bg-white/60'} shadow-sm border border-gray-300/30"></span>`).join('')}
+                        </div>
+                    ` : ''}
                 </div>
-                <h4 class="font-semibold text-gray-900 text-base mb-1 line-clamp-1">${prod.title}</h4>
-                <p class="text-pink-500 font-bold text-lg mb-3">₹${parseFloat(prod.price).toFixed(2)}</p>
-              </div>
-              <button id="btn-${prod.id}" onclick="addToCart('${prod.id}', 'btn-${prod.id}')" 
-                      class="w-full bg-brand-900 text-white text-xs font-medium py-2.5 rounded-full hover:bg-pink-500 transition-colors">
-                Add to Cart
-              </button>
+
+                <!-- Text & Action Area -->
+                <div class="p-5 flex flex-col flex-grow border-t border-gray-50">
+                    <div class="flex justify-between items-start mb-1 gap-2">
+                        <h3 onclick="openProductModal('${prod.id}')" class="font-semibold text-gray-900 cursor-pointer hover:text-pink-500 transition-colors text-base md:text-lg line-clamp-2 leading-tight flex-grow">
+                            ${prod.title}
+                        </h3>
+                        <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
+                    </div>
+                    
+                    <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Premium Plushie'}</p>
+                    
+                    <!-- Upgraded Add to Cart Button -->
+                    <button id="btn-${prod.id}" onclick="addToCart('${prod.id}', 'btn-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
+                        <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        Add to Cart
+                    </button>
+                </div>
             </div>
           `;
         }).join('');
@@ -415,10 +444,11 @@ import { supabase } from './supabaseClient.js';
         : '<li>No specifications listed.</li>';
     }
 
-    if (thumbsContainer) {
+   if (thumbsContainer) {
       thumbsContainer.innerHTML = images.map(img => `
-        <img src="${img}" onclick="document.getElementById('modal-main-img').src='${img}'" 
-             class="w-full aspect-square object-cover rounded-xl border border-gray-200 cursor-pointer hover:border-pink-500 transition-all">
+        <div onclick="changeModalImage('${img}')" class="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-pink-500 cursor-pointer bg-white transition-all p-1">
+            <img src="${img}" class="w-full h-full object-contain">
+        </div>
       `).join('');
     }
 
@@ -491,6 +521,37 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
+  // 7. Swipe Dot Tracker
+  function updateSliderDots(event, productId) {
+    const container = event.target;
+    const scrollLeft = container.scrollLeft;
+    const width = container.clientWidth;
+    const activeIndex = Math.round(scrollLeft / width);
+    
+    const dotsContainer = document.getElementById(`dots-${productId}`);
+    if (!dotsContainer) return;
+    
+    const dots = dotsContainer.children;
+    for (let i = 0; i < dots.length; i++) {
+        if (i === activeIndex) {
+            dots[i].className = "w-1.5 h-1.5 rounded-full transition-all duration-300 bg-white scale-125 shadow-sm border border-gray-300/30";
+        } else {
+            dots[i].className = "w-1.5 h-1.5 rounded-full transition-all duration-300 bg-white/60 shadow-sm border border-gray-300/30";
+        }
+    }
+  }
+
+  // 8. Amazon-style Main Image Switcher
+  function changeModalImage(src) {
+    const modalMainImg = document.getElementById('modal-main-img');
+    if (!modalMainImg) return;
+    
+    modalMainImg.classList.add('opacity-0');
+    setTimeout(() => {
+        modalMainImg.src = src;
+        modalMainImg.classList.remove('opacity-0');
+    }, 150);
+  }
   // Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
@@ -499,6 +560,8 @@ import { supabase } from './supabaseClient.js';
   window.closeModal = closeModal;
   window.addToCart = addToCart;
   window.selectColor = selectColor;
+  window.updateSliderDots = updateSliderDots; // NEW
+  window.changeModalImage = changeModalImage; // NEW
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => {
