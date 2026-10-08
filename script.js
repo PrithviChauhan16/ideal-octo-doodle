@@ -667,25 +667,42 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-// 9. Cutest Pepes Dynamic Interactive Showcase (Full Product Cards)
+// 9. Cutest Pepes Dynamic Interactive Showcase (Filtered by Pepe Category)
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
 
     try {
-      const { data: promoProducts } = await supabase
+      // Step 1: Find the specific 'Pepe' category ID
+      const { data: pepeCategory, error: catErr } = await supabase
+        .from('categories')
+        .select('id')
+        .ilike('name', '%pepe%') // Looks for any category containing "pepe"
+        .limit(1)
+        .single();
+
+      if (catErr || !pepeCategory) {
+        console.log('Pepe category not found for showcase.');
+        return;
+      }
+
+      // Step 2: Fetch products specifically belonging to the Pepe category
+      const { data: promoProducts, error: prodErr } = await supabase
         .from('products')
         .select('*')
+        .or(`category_id.eq.${pepeCategory.id},category_ids.cs.{"${pepeCategory.id}"}`)
         .limit(6);
 
-      if (!promoProducts || promoProducts.length === 0) return;
+      if (prodErr || !promoProducts || promoProducts.length === 0) return;
 
+      // Add to global products array for modal support
       promoProducts.forEach(p => {
         if (!products.some(existing => existing.id === p.id)) {
           products.push(p);
         }
       });
 
+      // Render the product cards into the horizontal track
       const cardsHTML = promoProducts.map(prod => {
         let imagesArr = [];
         try {
@@ -696,7 +713,6 @@ import { supabase } from './supabaseClient.js';
         
         const escapedImages = JSON.stringify(imagesArr).replace(/"/g, '&quot;');
 
-        // Return a full product card (identical to the main grid) but horizontally scrolling
         return `
           <div class="product-card w-64 md:w-72 flex-shrink-0 bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
               <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
@@ -727,7 +743,7 @@ import { supabase } from './supabaseClient.js';
                       <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
                   </div>
                   
-                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Premium Plushie'}</p>
+                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Pepe Special'}</p>
                   
                   <button id="btn-promo-${prod.id}" onclick="addToCart('${prod.id}', 'btn-promo-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
                       <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
@@ -738,12 +754,11 @@ import { supabase } from './supabaseClient.js';
         `;
       }).join('');
 
-      track.innerHTML = cardsHTML + cardsHTML; // Duplicate for infinite loop
+      track.innerHTML = cardsHTML + cardsHTML; // Duplicate for smooth infinite scroll effect
     } catch (err) {
       console.error('Error loading Cutest Pepes showcase:', err);
     }
   }
-
   // 10. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
