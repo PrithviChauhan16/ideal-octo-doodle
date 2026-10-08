@@ -86,7 +86,6 @@ import { supabase } from './supabaseClient.js';
     localStorage.setItem('pepe_cart', JSON.stringify(cart));
   }
 
-  // Color selection helper
   function selectColor(color, btnElement) {
     selectedColor = color;
     document.querySelectorAll('.color-btn').forEach(btn => {
@@ -266,7 +265,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View (Upgraded Card UI)
+  // 4. Primary Category Drilldown View
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -382,7 +381,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 5. Quick-View Modal Functions (Upgraded Amazon UI)
+  // 5. Quick-View Modal Functions
   function openProductModal(productId) {
     const prod = products.find(p => String(p.id) === String(productId));
     if (!prod) return;
@@ -433,21 +432,16 @@ import { supabase } from './supabaseClient.js';
       }
     }
 
-    // New Swipeable Modal Track Injection
-   const modalSwipeTrack = document.getElementById('modal-swipe-track');
-    
-// New Swipeable Modal Track Injection
+    // Modal track generation integrating the Fullscreen Gallery trigger
     const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
-      // Escape the array so it can be safely passed inside the onclick attribute
       const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
-      
       modalSwipeTrack.innerHTML = images.map((img, index) => `
           <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
               <img src="${img}" onclick="openFullscreenGallery(${escapedImages}, ${index})" class="w-full h-full object-contain cursor-zoom-in active:opacity-75 transition-opacity" title="Tap to expand">
           </div>
       `).join('');
-      modalSwipeTrack.scrollLeft = 0; // Reset scroll to first image
+      modalSwipeTrack.scrollLeft = 0;
     }
 
     if (title) title.textContent = prod.title;
@@ -460,7 +454,6 @@ import { supabase } from './supabaseClient.js';
         : '<li>No specifications listed.</li>';
     }
 
-    // New Amazon-Style Thumbnail Generation (Now uses INDEX)
     if (thumbsContainer) {
       thumbsContainer.innerHTML = images.map((img, index) => `
         <div onclick="changeModalImage(${index})" class="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-pink-500 cursor-pointer bg-white transition-all p-1">
@@ -567,7 +560,6 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // Helper to click arrows on the modal (Desktop)
   function scrollModalSlider(direction) {
     const track = document.getElementById('modal-swipe-track');
     if (track) {
@@ -576,7 +568,6 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // Helper to snap to an image when a thumbnail is clicked (Amazon-style)
   function changeModalImage(index) {
     const track = document.getElementById('modal-swipe-track');
     if (track) {
@@ -585,33 +576,29 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 9. Fullscreen Gallery Logic
+  // 8. Fullscreen Gallery Logic
   function openFullscreenGallery(images, startIndex) {
     const gallery = document.getElementById('fullscreen-gallery');
     const track = document.getElementById('gallery-swipe-track');
     if (!gallery || !track) return;
 
-    // Inject the photos into the fullscreen track
     track.innerHTML = images.map((img) => `
         <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4 md:p-12">
             <img src="${img}" class="max-w-full max-h-full object-contain select-none">
         </div>
     `).join('');
 
-    // Open the overlay
     gallery.classList.remove('hidden');
     gallery.classList.add('flex');
     
     setTimeout(() => {
         gallery.classList.remove('opacity-0');
         
-        // Immediately snap to the image the user actually clicked
         const width = track.clientWidth;
         track.scrollTo({ left: startIndex * width, behavior: 'instant' });
         updateGalleryCounter(startIndex, images.length);
     }, 10);
 
-    // Track swiping to update the counter
     track.onscroll = () => {
         const activeIndex = Math.round(track.scrollLeft / track.clientWidth);
         updateGalleryCounter(activeIndex, images.length);
@@ -640,8 +627,8 @@ import { supabase } from './supabaseClient.js';
           track.scrollBy({ left: direction * width, behavior: 'smooth' });
       }
   }
-  
-  // 8. Expose global handlers needed for inline onclick attributes in HTML
+
+  // 9. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
   window.scrollCategoryRow = scrollCategoryRow;
@@ -651,11 +638,11 @@ import { supabase } from './supabaseClient.js';
   window.selectColor = selectColor;
   window.updateSliderDots = updateSliderDots;
   window.scrollProductSlider = scrollProductSlider;
-  window.scrollModalSlider = scrollModalSlider; // NEW
-  window.changeModalImage = changeModalImage; // UPDATED
-  window.openFullscreenGallery = openFullscreenGallery; // NEW
-  window.closeFullscreenGallery = closeFullscreenGallery; // NEW
-  window.scrollGallerySlider = scrollGallerySlider; // NEW
+  window.scrollModalSlider = scrollModalSlider;
+  window.changeModalImage = changeModalImage;
+  window.openFullscreenGallery = openFullscreenGallery;
+  window.closeFullscreenGallery = closeFullscreenGallery;
+  window.scrollGallerySlider = scrollGallerySlider;
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => {
