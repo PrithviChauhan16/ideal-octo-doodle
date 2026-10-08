@@ -434,11 +434,13 @@ import { supabase } from './supabaseClient.js';
     }
 
     // New Swipeable Modal Track Injection
-    const modalSwipeTrack = document.getElementById('modal-swipe-track');
+   const modalSwipeTrack = document.getElementById('modal-swipe-track');
+    
+    // Inject the main photos with a window.open click/tap event for zooming on all devices
     if (modalSwipeTrack) {
       modalSwipeTrack.innerHTML = images.map(img => `
           <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
-              <img src="${img}" class="w-full h-full object-contain">
+              <img src="${img}" onclick="window.open('${img}', '_blank')" class="w-full h-full object-contain cursor-zoom-in active:opacity-75 transition-opacity" title="Tap to zoom">
           </div>
       `).join('');
       modalSwipeTrack.scrollLeft = 0; // Reset scroll to first image
