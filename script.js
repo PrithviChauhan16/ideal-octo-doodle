@@ -653,6 +653,9 @@ import { supabase } from './supabaseClient.js';
   window.scrollProductSlider = scrollProductSlider;
   window.scrollModalSlider = scrollModalSlider; // NEW
   window.changeModalImage = changeModalImage; // UPDATED
+  window.openFullscreenGallery = openFullscreenGallery; // NEW
+  window.closeFullscreenGallery = closeFullscreenGallery; // NEW
+  window.scrollGallerySlider = scrollGallerySlider; // NEW
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => {
