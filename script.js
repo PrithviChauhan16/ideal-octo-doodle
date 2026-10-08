@@ -673,36 +673,56 @@ import { supabase } from './supabaseClient.js';
     if (!track) return;
 
     try {
-      // Step 1: Find the specific 'Pepe' category ID
-      const { data: pepeCategory, error: catErr } = await supabase
+      // Step 1: Find the 'Pepe' category. We use ilike for case-insensitivity.
+      const { data: categories, error: catErr } = await supabase
         .from('categories')
-        .select('id')
-        .ilike('name', '%pepe%') // Looks for any category containing "pepe"
-        .limit(1)
-        .single();
+        .select('id, name')
+        .ilike('name', '%pepe%'); // Find any category with "pepe" in the name
 
-      if (catErr || !pepeCategory) {
-        console.log('Pepe category not found for showcase.');
+      if (catErr) {
+        console.error('Error fetching categories for showcase:', catErr);
         return;
       }
 
-      // Step 2: Fetch products specifically belonging to the Pepe category
-      const { data: promoProducts, error: prodErr } = await supabase
-        .from('products')
-        .select('*')
-        .or(`category_id.eq.${pepeCategory.id},category_ids.cs.{"${pepeCategory.id}"}`)
-        .limit(6);
+      // If no category matches, fall back to fetching *any* products to prevent an empty section
+      let promoProducts = [];
+      
+      if (categories && categories.length > 0) {
+        // Use the first matching category (e.g., "Pepe", "PEPE SPECIALS")
+        const targetCategoryId = categories[0].id;
+        console.log('Loading showcase products for category:', categories[0].name);
 
-      if (prodErr || !promoProducts || promoProducts.length === 0) return;
+        const { data: prodData, error: prodErr } = await supabase
+          .from('products')
+          .select('*')
+          // Check both primary category_id and array of category_ids
+          .or(`category_id.eq.${targetCategoryId},category_ids.cs.{"${targetCategoryId}"}`)
+          .limit(8); // Fetch up to 8 items
 
-      // Add to global products array for modal support
+        if (prodErr) throw prodErr;
+        promoProducts = prodData || [];
+      } 
+      
+      // Fallback: If no products found in that category, or the category doesn't exist yet, load latest products
+      if (promoProducts.length === 0) {
+        console.log('Fallback: Loading recent products for showcase.');
+        const { data: fallbackData } = await supabase
+            .from('products')
+            .select('*')
+            .limit(8);
+        promoProducts = fallbackData || [];
+      }
+
+      if (promoProducts.length === 0) return; // Still empty? Exit.
+
+      // Add to global products array so the modal can find them when clicked
       promoProducts.forEach(p => {
         if (!products.some(existing => existing.id === p.id)) {
           products.push(p);
         }
       });
 
-      // Render the product cards into the horizontal track
+      // Render the full product cards
       const cardsHTML = promoProducts.map(prod => {
         let imagesArr = [];
         try {
@@ -743,7 +763,7 @@ import { supabase } from './supabaseClient.js';
                       <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
                   </div>
                   
-                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Pepe Special'}</p>
+                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Pepe Collection'}</p>
                   
                   <button id="btn-promo-${prod.id}" onclick="addToCart('${prod.id}', 'btn-promo-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
                       <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
@@ -754,7 +774,8 @@ import { supabase } from './supabaseClient.js';
         `;
       }).join('');
 
-      track.innerHTML = cardsHTML + cardsHTML; // Duplicate for smooth infinite scroll effect
+      // Duplicate the inner HTML so the CSS marquee animation loops seamlessly
+      track.innerHTML = cardsHTML + cardsHTML; 
     } catch (err) {
       console.error('Error loading Cutest Pepes showcase:', err);
     }
