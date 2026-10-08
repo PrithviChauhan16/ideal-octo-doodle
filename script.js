@@ -303,7 +303,6 @@ import { supabase } from './supabaseClient.js';
       }
     });
 
-    if (productGrid) {
 if (categoryProds.length === 0) {
         productGrid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">No products found in this category.</p>`;
       } else {
@@ -313,23 +312,28 @@ if (categoryProds.length === 0) {
           return `
             <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
                 
-                <!-- Image Slider Container (Swipeable) -->
+                <!-- Image Slider Container -->
                 <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider">
                     
-                    <!-- Swipeable Track -->
-                    <div class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar" onscroll="updateSliderDots(event, '${prod.id}')">
+                    <!-- Swipeable Track (Native swipe on mobile, smooth scroll on desktop) -->
+                    <div id="slider-${prod.id}" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar scroll-smooth" onscroll="updateSliderDots(event, '${prod.id}')">
                         ${imagesArr.map((img) => `
-                            <div class="min-w-full h-full snap-center p-4 flex-shrink-0 flex items-center justify-center cursor-pointer" onclick="openProductModal('${prod.id}')">
-                                <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain transition-transform duration-700 group-hover/slider:scale-105">
+                            <!-- flex-none and w-full fixes the alignment so it stays perfectly centered -->
+                            <div class="w-full h-full flex-none snap-center p-5 flex items-center justify-center cursor-pointer" onclick="openProductModal('${prod.id}')">
+                                <img src="${img}" alt="${prod.title}" class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover/slider:scale-105">
                             </div>
                         `).join('')}
                     </div>
                     
-                    <!-- Bottom Gradient for Dots visibility -->
-                    <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/10 to-transparent pointer-events-none rounded-b-2xl"></div>
-
-                    <!-- Dot Indicators -->
+                    <!-- Desktop Arrows (Hidden on mobile, appears on desktop hover) -->
                     ${imagesArr.length > 1 ? `
+                        <button onclick="scrollProductSlider(event, '${prod.id}', -1)" class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-10 pb-1 text-xl leading-none">‹</button>
+                        <button onclick="scrollProductSlider(event, '${prod.id}', 1)" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-10 pb-1 text-xl leading-none">›</button>
+                        
+                        <!-- Bottom Gradient -->
+                        <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/10 to-transparent pointer-events-none rounded-b-2xl"></div>
+
+                        <!-- Dot Indicators -->
                         <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 pointer-events-none z-10" id="dots-${prod.id}">
                             ${imagesArr.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white scale-125' : 'bg-white/60'} shadow-sm border border-gray-300/30"></span>`).join('')}
                         </div>
@@ -347,7 +351,6 @@ if (categoryProds.length === 0) {
                     
                     <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Premium Plushie'}</p>
                     
-                    <!-- Upgraded Add to Cart Button -->
                     <button id="btn-${prod.id}" onclick="addToCart('${prod.id}', 'btn-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
                         <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                         Add to Cart
@@ -552,6 +555,16 @@ if (categoryProds.length === 0) {
         modalMainImg.classList.remove('opacity-0');
     }, 150);
   }
+// 9. Desktop Arrow Scroll Helper
+  function scrollProductSlider(event, productId, direction) {
+    event.stopPropagation(); // Prevents the modal from opening when you click the arrow
+    const slider = document.getElementById(`slider-${productId}`);
+    if (slider) {
+        // Scroll left or right exactly one image width
+        const scrollAmount = slider.clientWidth;
+        slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+  }
   // Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
@@ -560,8 +573,10 @@ if (categoryProds.length === 0) {
   window.closeModal = closeModal;
   window.addToCart = addToCart;
   window.selectColor = selectColor;
-  window.updateSliderDots = updateSliderDots; // NEW
-  window.changeModalImage = changeModalImage; // NEW
+  window.updateSliderDots = updateSliderDots; 
+  window.changeModalImage = changeModalImage; 
+  window.scrollProductSlider = scrollProductSlider; // NEW
+
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => {
