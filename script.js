@@ -103,7 +103,6 @@ import { supabase } from './supabaseClient.js';
     const product = products.find(p => String(p.id) === String(productId));
     if (!product && !currentUser) return;
 
-    // Validate if product requires color selection
     let availableColors = [];
     try {
       availableColors = Array.isArray(product?.colors) ? product.colors : JSON.parse(product?.colors || '[]');
@@ -267,7 +266,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View
+  // 4. Primary Category Drilldown View (Upgraded Card UI)
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -303,11 +302,17 @@ import { supabase } from './supabaseClient.js';
       }
     });
 
-if (categoryProds.length === 0) {
+    if (productGrid) {
+      if (categoryProds.length === 0) {
         productGrid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">No products found in this category.</p>`;
       } else {
         productGrid.innerHTML = categoryProds.map(prod => {
-          const imagesArr = Array.isArray(prod.images) ? prod.images : JSON.parse(prod.images || '[]');
+          let imagesArr = [];
+          try {
+             imagesArr = Array.isArray(prod.images) ? prod.images : JSON.parse(prod.images || '[]');
+          } catch(e) {
+             imagesArr = [prod.images || 'https://via.placeholder.com/300'];
+          }
           
           return `
             <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
@@ -315,25 +320,22 @@ if (categoryProds.length === 0) {
                 <!-- Image Slider Container -->
                 <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider">
                     
-                    <!-- Swipeable Track (Native swipe on mobile, smooth scroll on desktop) -->
+                    <!-- Swipeable Track -->
                     <div id="slider-${prod.id}" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar scroll-smooth" onscroll="updateSliderDots(event, '${prod.id}')">
                         ${imagesArr.map((img) => `
-                            <!-- flex-none and w-full fixes the alignment so it stays perfectly centered -->
                             <div class="w-full h-full flex-none snap-center p-5 flex items-center justify-center cursor-pointer" onclick="openProductModal('${prod.id}')">
                                 <img src="${img}" alt="${prod.title}" class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover/slider:scale-105">
                             </div>
                         `).join('')}
                     </div>
                     
-                    <!-- Desktop Arrows (Hidden on mobile, appears on desktop hover) -->
+                    <!-- Desktop Arrows -->
                     ${imagesArr.length > 1 ? `
                         <button onclick="scrollProductSlider(event, '${prod.id}', -1)" class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-10 pb-1 text-xl leading-none">‹</button>
                         <button onclick="scrollProductSlider(event, '${prod.id}', 1)" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-10 pb-1 text-xl leading-none">›</button>
                         
-                        <!-- Bottom Gradient -->
+                        <!-- Bottom Gradient & Dots -->
                         <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/10 to-transparent pointer-events-none rounded-b-2xl"></div>
-
-                        <!-- Dot Indicators -->
                         <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 pointer-events-none z-10" id="dots-${prod.id}">
                             ${imagesArr.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white scale-125' : 'bg-white/60'} shadow-sm border border-gray-300/30"></span>`).join('')}
                         </div>
@@ -387,12 +389,12 @@ if (categoryProds.length === 0) {
     }, 300);
   }
 
-  // 5. Quick-View Modal Functions
+  // 5. Quick-View Modal Functions (Upgraded Amazon UI)
   function openProductModal(productId) {
     const prod = products.find(p => String(p.id) === String(productId));
     if (!prod) return;
 
-    selectedColor = null; // Reset chosen color
+    selectedColor = null;
 
     const modal = document.getElementById('product-modal');
     const mainImg = document.getElementById('modal-main-img');
@@ -402,14 +404,18 @@ if (categoryProds.length === 0) {
     const specsList = document.getElementById('modal-specs-list');
     const thumbsContainer = document.getElementById('modal-thumbnails');
     const addCartBtn = document.getElementById('modal-add-cart-btn');
-
     const colorsContainer = document.getElementById('modal-colors-container');
     const colorsOptions = document.getElementById('modal-color-options');
 
-    const images = Array.isArray(prod.images) ? prod.images : JSON.parse(prod.images || '[]');
+    let images = [];
+    try {
+        images = Array.isArray(prod.images) ? prod.images : JSON.parse(prod.images || '[]');
+    } catch(e) {
+        images = [prod.images || 'https://via.placeholder.com/300'];
+    }
+    
     const specs = Array.isArray(prod.specifications) ? prod.specifications : JSON.parse(prod.specifications || '[]');
 
-    // Parse colors
     let colors = [];
     try {
       colors = Array.isArray(prod.colors) ? prod.colors : JSON.parse(prod.colors || '[]');
@@ -419,7 +425,6 @@ if (categoryProds.length === 0) {
       }
     }
 
-    // Render Color Options
     if (colorsContainer && colorsOptions) {
       if (colors.length > 0) {
         colorsContainer.classList.remove('hidden');
@@ -447,7 +452,8 @@ if (categoryProds.length === 0) {
         : '<li>No specifications listed.</li>';
     }
 
-   if (thumbsContainer) {
+    // New Amazon-Style Thumbnail Generation
+    if (thumbsContainer) {
       thumbsContainer.innerHTML = images.map(img => `
         <div onclick="changeModalImage('${img}')" class="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-pink-500 cursor-pointer bg-white transition-all p-1">
             <img src="${img}" class="w-full h-full object-contain">
@@ -524,7 +530,7 @@ if (categoryProds.length === 0) {
     }
   }
 
-  // 7. Swipe Dot Tracker
+  // 7. Swiping UI Helpers
   function updateSliderDots(event, productId) {
     const container = event.target;
     const scrollLeft = container.scrollLeft;
@@ -544,28 +550,26 @@ if (categoryProds.length === 0) {
     }
   }
 
-  // 8. Amazon-style Main Image Switcher
+  function scrollProductSlider(event, productId, direction) {
+    event.stopPropagation();
+    const slider = document.getElementById(`slider-${productId}`);
+    if (slider) {
+        const scrollAmount = slider.clientWidth;
+        slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+  }
+
   function changeModalImage(src) {
     const modalMainImg = document.getElementById('modal-main-img');
     if (!modalMainImg) return;
-    
     modalMainImg.classList.add('opacity-0');
     setTimeout(() => {
         modalMainImg.src = src;
         modalMainImg.classList.remove('opacity-0');
     }, 150);
   }
-// 9. Desktop Arrow Scroll Helper
-  function scrollProductSlider(event, productId, direction) {
-    event.stopPropagation(); // Prevents the modal from opening when you click the arrow
-    const slider = document.getElementById(`slider-${productId}`);
-    if (slider) {
-        // Scroll left or right exactly one image width
-        const scrollAmount = slider.clientWidth;
-        slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-    }
-  }
-  // Expose global handlers needed for inline onclick attributes in HTML
+
+  // 8. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
   window.scrollCategoryRow = scrollCategoryRow;
@@ -573,10 +577,9 @@ if (categoryProds.length === 0) {
   window.closeModal = closeModal;
   window.addToCart = addToCart;
   window.selectColor = selectColor;
-  window.updateSliderDots = updateSliderDots; 
-  window.changeModalImage = changeModalImage; 
-  window.scrollProductSlider = scrollProductSlider; // NEW
-
+  window.updateSliderDots = updateSliderDots;
+  window.scrollProductSlider = scrollProductSlider;
+  window.changeModalImage = changeModalImage;
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => {
