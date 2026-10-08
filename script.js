@@ -570,8 +570,52 @@ import { supabase } from './supabaseClient.js';
       }
     }
   }
+    // 8. Swiping UI Helpers
+  function updateSliderDots(event, productId) {
+    const container = event.target;
+    const scrollLeft = container.scrollLeft;
+    const width = container.clientWidth;
+    const activeIndex = Math.round(scrollLeft / width);
 
-  // 7. Fullscreen Gallery Zoom Logic
+    const dotsContainer = document.getElementById(`dots-${productId}`);
+    if (!dotsContainer) return;
+
+    const dots = dotsContainer.children;
+    for (let i = 0; i < dots.length; i++) {
+        if (i === activeIndex) {
+            dots[i].className = "w-1.5 h-1.5 rounded-full transition-all duration-300 bg-white scale-125 shadow-sm border border-gray-300/30";
+        } else {
+            dots[i].className = "w-1.5 h-1.5 rounded-full transition-all duration-300 bg-white/60 shadow-sm border border-gray-300/30";
+        }
+    }
+  }
+
+  function scrollProductSlider(event, productId, direction) {
+    event.stopPropagation();
+    const slider = document.getElementById(`slider-${productId}`);
+    if (slider) {
+        const scrollAmount = slider.clientWidth;
+        slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+  }
+
+  function scrollModalSlider(direction) {
+    const track = document.getElementById('modal-swipe-track');
+    if (track) {
+        const width = track.clientWidth;
+        track.scrollBy({ left: direction * width, behavior: 'smooth' });
+    }
+  }
+
+  function changeModalImage(index) {
+    const track = document.getElementById('modal-swipe-track');
+    if (track) {
+        const width = track.clientWidth;
+        track.scrollTo({ left: index * width, behavior: 'smooth' });
+    }
+  }
+
+// 8. Fullscreen Gallery Zoom Logic
   function openFullscreenGallery(images, startIndex) {
     const gallery = document.getElementById('fullscreen-gallery');
     const track = document.getElementById('gallery-swipe-track');
@@ -622,113 +666,33 @@ import { supabase } from './supabaseClient.js';
       }
   }
 
-  // 8. Swiping UI Helpers
-  function updateSliderDots(event, productId) {
-    const container = event.target;
-    const scrollLeft = container.scrollLeft;
-    const width = container.clientWidth;
-    const activeIndex = Math.round(scrollLeft / width);
-
-    const dotsContainer = document.getElementById(`dots-${productId}`);
-    if (!dotsContainer) return;
-
-    const dots = dotsContainer.children;
-    for (let i = 0; i < dots.length; i++) {
-        if (i === activeIndex) {
-            dots[i].className = "w-1.5 h-1.5 rounded-full transition-all duration-300 bg-white scale-125 shadow-sm border border-gray-300/30";
-        } else {
-            dots[i].className = "w-1.5 h-1.5 rounded-full transition-all duration-300 bg-white/60 shadow-sm border border-gray-300/30";
-        }
-    }
-  }
-
-  function scrollProductSlider(event, productId, direction) {
-    event.stopPropagation();
-    const slider = document.getElementById(`slider-${productId}`);
-    if (slider) {
-        const scrollAmount = slider.clientWidth;
-        slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-    }
-  }
-
-  function scrollModalSlider(direction) {
-    const track = document.getElementById('modal-swipe-track');
-    if (track) {
-        const width = track.clientWidth;
-        track.scrollBy({ left: direction * width, behavior: 'smooth' });
-    }
-  }
-
-  function changeModalImage(index) {
-    const track = document.getElementById('modal-swipe-track');
-    if (track) {
-        const width = track.clientWidth;
-        track.scrollTo({ left: index * width, behavior: 'smooth' });
-    }
-  }
-
-// 9. Cutest Pepes Dynamic Interactive Showcase (Filtered by Pepe Category)
+  // 9. Cutest Pepes Dynamic Interactive Showcase (Admin Selected)
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
 
     try {
-      // Step 1: Find the 'Pepe' category. We use ilike for case-insensitivity.
-      const { data: categories, error: catErr } = await supabase
-        .from('categories')
-        .select('id, name')
-        .ilike('name', '%pepe%'); // Find any category with "pepe" in the name
+      // Fetch ONLY the products explicitly tagged as cutest pepe in your database
+      const { data: promoProducts, error: prodErr } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_cutest_pepe', true)
+        .limit(6);
 
-      if (catErr) {
-        console.error('Error fetching categories for showcase:', catErr);
-        return;
-      }
+      if (prodErr || !promoProducts || promoProducts.length === 0) return;
 
-      // If no category matches, fall back to fetching *any* products to prevent an empty section
-      let promoProducts = [];
-      
-      if (categories && categories.length > 0) {
-        // Use the first matching category (e.g., "Pepe", "PEPE SPECIALS")
-        const targetCategoryId = categories[0].id;
-        console.log('Loading showcase products for category:', categories[0].name);
-
-        const { data: prodData, error: prodErr } = await supabase
-          .from('products')
-          .select('*')
-          // Check both primary category_id and array of category_ids
-          .or(`category_id.eq.${targetCategoryId},category_ids.cs.{"${targetCategoryId}"}`)
-          .limit(8); // Fetch up to 8 items
-
-        if (prodErr) throw prodErr;
-        promoProducts = prodData || [];
-      } 
-      
-      // Fallback: If no products found in that category, or the category doesn't exist yet, load latest products
-      if (promoProducts.length === 0) {
-        console.log('Fallback: Loading recent products for showcase.');
-        const { data: fallbackData } = await supabase
-            .from('products')
-            .select('*')
-            .limit(8);
-        promoProducts = fallbackData || [];
-      }
-
-      if (promoProducts.length === 0) return; // Still empty? Exit.
-
-      // Add to global products array so the modal can find them when clicked
       promoProducts.forEach(p => {
         if (!products.some(existing => existing.id === p.id)) {
           products.push(p);
         }
       });
 
-      // Render the full product cards
       const cardsHTML = promoProducts.map(prod => {
         let imagesArr = [];
         try {
           imagesArr = Array.isArray(prod.images) ? prod.images : JSON.parse(prod.images || '[]');
         } catch(e) {
-          imagesArr = [prod.images || '1.png'];
+          imagesArr = [prod.images || 'https://via.placeholder.com/300'];
         }
         
         const escapedImages = JSON.stringify(imagesArr).replace(/"/g, '&quot;');
@@ -763,7 +727,7 @@ import { supabase } from './supabaseClient.js';
                       <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
                   </div>
                   
-                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Pepe Collection'}</p>
+                  <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Pepe Special'}</p>
                   
                   <button id="btn-promo-${prod.id}" onclick="addToCart('${prod.id}', 'btn-promo-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
                       <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
@@ -774,12 +738,12 @@ import { supabase } from './supabaseClient.js';
         `;
       }).join('');
 
-      // Duplicate the inner HTML so the CSS marquee animation loops seamlessly
-      track.innerHTML = cardsHTML + cardsHTML; 
+      track.innerHTML = cardsHTML + cardsHTML;
     } catch (err) {
       console.error('Error loading Cutest Pepes showcase:', err);
     }
   }
+
   // 10. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
