@@ -287,12 +287,20 @@
                 </svg>
             </button>
 
-            <div class="md:w-1/2 p-6 bg-gray-50 flex flex-col gap-4 overflow-y-auto border-r border-gray-100">
-                <div
-                    class="w-full aspect-square rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-sm">
-                    <img id="modal-main-img" src=""
-                        class="w-full h-full object-cover transition-transform duration-500">
+<div class="md:w-1/2 p-6 bg-gray-50 flex flex-col gap-4 overflow-y-auto border-r border-gray-100">
+                
+                <!-- NEW SWIPEABLE MODAL IMAGE CONTAINER -->
+                <div class="w-full aspect-square rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-sm relative group">
+                    
+                    <div id="modal-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative touch-pan-x">
+                        <!-- Dynamic swipeable images will be injected here by script.js -->
+                    </div>
+
+                    <!-- Desktop Arrows for Modal -->
+                    <button onclick="scrollModalSlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md z-30 text-2xl pb-1 cursor-pointer">‹</button>
+                    <button onclick="scrollModalSlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-10 h-10 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md z-30 text-2xl pb-1 cursor-pointer">›</button>
                 </div>
+
                 <div class="grid grid-cols-4 gap-3 mt-2" id="modal-thumbnails"></div>
             </div>
 
