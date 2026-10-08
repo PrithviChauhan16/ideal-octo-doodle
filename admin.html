@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | PEPE KUN</title>
+    <link rel="icon" href="1pepe-logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SUPABASE JS CLIENT CDN -->
@@ -29,16 +30,26 @@
     </script>
 </head>
 
-<body class="bg-gray-50 text-brand-900 antialiased font-sans flex h-screen overflow-hidden">
+<body class="bg-gray-50 text-brand-900 antialiased font-sans flex flex-col md:flex-row h-screen overflow-hidden">
 
-    <!-- SIDEBAR -->
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 z-20 shadow-sm">
-        <div class="h-20 flex items-center px-8 border-b border-gray-100">
-            <span class="text-xl font-bold tracking-widest uppercase">PEPE KUN <span
-                    class="text-pink-500 text-sm">ADMIN</span></span>
+    <!-- MOBILE TOP BAR -->
+    <div class="md:hidden flex items-center justify-between bg-white border-b border-gray-200 px-6 py-4 z-30 flex-shrink-0">
+        <span class="text-lg font-bold tracking-widest uppercase">PEPE KUN <span class="text-pink-500 text-xs">ADMIN</span></span>
+        <button onclick="toggleMobileSidebar()" class="p-2 text-gray-600 hover:text-pink-500 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- SIDEBAR (Desktop sidebar + Mobile drawer) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-lg md:shadow-none md:static flex-shrink-0">
+        <div class="h-20 flex items-center justify-between px-8 border-b border-gray-100">
+            <span class="text-xl font-bold tracking-widest uppercase">PEPE KUN <span class="text-pink-500 text-sm">ADMIN</span></span>
+            <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
         </div>
 
-        <nav class="flex-grow py-6 flex flex-col gap-2 px-4">
+        <nav class="flex-grow py-6 flex flex-col gap-2 px-4 overflow-y-auto">
             <button onclick="switchTab('orders')" id="nav-orders"
                 class="nav-btn w-full text-left px-4 py-3 rounded-xl font-medium text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors bg-pink-50 text-pink-600">
                 📦 Orders
@@ -70,26 +81,28 @@
         </div>
     </aside>
 
+    <!-- MOBILE SIDEBAR BACKDROP -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 hidden md:hidden"></div>
+
     <!-- MAIN CONTENT AREA -->
-    <main class="flex-grow overflow-y-auto bg-gray-50 relative">
-        <div class="p-8 max-w-7xl mx-auto">
+    <main class="flex-grow overflow-y-auto bg-gray-50 relative w-full">
+        <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
 
             <!-- ORDERS TAB -->
             <section id="tab-orders" class="tab-content block">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-semibold">Customer Orders</h1>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h1 class="text-xl md:text-2xl font-semibold">Customer Orders</h1>
                     <button onclick="fetchOrders()"
-                        class="text-xs bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+                        class="text-xs bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
                         🔄 Refresh Orders
                     </button>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[700px]">
                             <thead>
-                                <tr
-                                    class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
-                                    <th class="p-4 font-medium">Date / Order ID</th>
+                                <tr class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+                                    <th class="p-4 font-medium">Date / ID</th>
                                     <th class="p-4 font-medium">Customer Details</th>
                                     <th class="p-4 font-medium">Payment / UTR</th>
                                     <th class="p-4 font-medium">Total</th>
@@ -109,8 +122,8 @@
 
             <!-- PRODUCTS TAB -->
             <section id="tab-products" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-semibold">Manage Products</h1>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h1 class="text-xl md:text-2xl font-semibold">Manage Products</h1>
                     <button onclick="openAddProduct()"
                         class="bg-brand-900 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm">
                         + Add New Product
@@ -137,7 +150,7 @@
                                     class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400 text-sm">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Available Colors <span class="text-xs text-gray-400 font-normal">(Comma-separated, e.g. Pink, Olive Green, White, Blue)</span></label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Available Colors <span class="text-xs text-gray-400 font-normal">(Comma-separated, e.g. Pink, Olive Green, White)</span></label>
                                 <input type="text" id="prod-colors" placeholder="e.g. Pink, Olive Green, White"
                                     class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400 text-sm">
                             </div>
@@ -149,17 +162,16 @@
                                         <div id="prod-category-main" class="space-y-2 text-sm text-gray-700"></div>
                                     </div>
                                     <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Sub categories (e.g. Special for Her, Best for Kids)</p>
+                                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Sub categories</p>
                                         <div id="prod-category-sub" class="space-y-2 text-sm text-gray-700"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 4 PRODUCT IMAGES INPUT SECTION -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Product Images (Upload up to 4 images)</label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                                 <div>
                                     <span class="text-xs text-gray-500 mb-1 block">Main Image *</span>
                                     <input type="file" id="prod-img-1" accept="image/*"
@@ -206,9 +218,8 @@
                     </form>
                 </div>
 
-                <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div
-                        class="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-200 rounded-2xl">
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-200 rounded-2xl">
                         No products added yet. Click "+ Add New Product" to get started.
                     </div>
                 </div>
@@ -216,15 +227,15 @@
 
             <!-- CATEGORIES TAB -->
             <section id="tab-categories" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-semibold">Categories</h1>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h1 class="text-xl md:text-2xl font-semibold">Categories</h1>
                     <button onclick="addNewCategory()"
                         class="bg-brand-900 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm">
                         + New Category
                     </button>
                 </div>
 
-                <div id="categories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <div id="empty-categories-state"
                         class="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-200 rounded-2xl">
                         No categories created yet. Click "+ New Category" to add one.
@@ -234,31 +245,32 @@
 
             <!-- INQUIRIES TAB -->
             <section id="tab-inquiries" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-semibold">Customer Inquiries</h1>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h1 class="text-xl md:text-2xl font-semibold">Customer Inquiries</h1>
                     <button onclick="fetchInquiries()"
-                        class="text-xs bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+                        class="text-xs bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
                         🔄 Refresh Inquiries
                     </button>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr
-                                class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
-                                <th class="p-4 font-medium">Date</th>
-                                <th class="p-4 font-medium">Name</th>
-                                <th class="p-4 font-medium">Email</th>
-                                <th class="p-4 font-medium">Message Preview</th>
-                                <th class="p-4 font-medium">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inquiries-list" class="text-sm divide-y divide-gray-100">
-                            <tr>
-                                <td colspan="5" class="p-8 text-center text-gray-500">Loading inquiries...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+                                    <th class="p-4 font-medium">Date</th>
+                                    <th class="p-4 font-medium">Name</th>
+                                    <th class="p-4 font-medium">Email</th>
+                                    <th class="p-4 font-medium">Message Preview</th>
+                                    <th class="p-4 font-medium">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inquiries-list" class="text-sm divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="5" class="p-8 text-center text-gray-500">Loading inquiries...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -266,42 +278,29 @@
     </main>
 
     <!-- ORDER DETAILS MODAL -->
-    <div id="order-modal"
-        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div id="order-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-xl w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4">
                 <h3 class="text-xl font-bold text-gray-900">Order Details</h3>
-                <button onclick="closeOrderModal()"
-                    class="text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
+                <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
             </div>
-
-            <div id="modal-content" class="space-y-4 text-sm text-gray-600">
-                <!-- Populated dynamically -->
-            </div>
+            <div id="modal-content" class="space-y-4 text-sm text-gray-600"></div>
         </div>
     </div>
 
     <!-- INQUIRY MESSAGE MODAL -->
-    <div id="inquiry-modal"
-        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div id="inquiry-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl space-y-6">
             <div class="flex justify-between items-center border-b pb-4">
                 <h3 class="text-xl font-bold text-gray-900">Customer Message</h3>
-                <button onclick="closeInquiryModal()"
-                    class="text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
+                <button onclick="closeInquiryModal()" class="text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
             </div>
-
-            <div id="inquiry-modal-content" class="space-y-4 text-sm text-gray-600">
-                <!-- Populated dynamically -->
-            </div>
-
-            <div class="pt-4 border-t flex justify-between items-center">
-                <a id="inquiry-reply-btn" href="#"
-                    class="px-5 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-full font-medium text-xs transition-colors">
+            <div id="inquiry-modal-content" class="space-y-4 text-sm text-gray-600"></div>
+            <div class="pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
+                <a id="inquiry-reply-btn" href="#" class="w-full sm:w-auto text-center px-5 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-full font-medium text-xs transition-colors">
                     ✉️ Reply via Email
                 </a>
-                <button onclick="closeInquiryModal()"
-                    class="px-6 py-2 bg-gray-900 text-white rounded-full font-medium text-sm">Close</button>
+                <button onclick="closeInquiryModal()" class="w-full sm:w-auto px-6 py-2 bg-gray-900 text-white rounded-full font-medium text-sm">Close</button>
             </div>
         </div>
     </div>
@@ -309,11 +308,8 @@
     <!-- IMPORT SUPABASE CLIENT AND RUN INITIALIZATION -->
     <script type="module">
         import { supabase } from './supabaseClient.js';
-
-        // Expose client globally so inline onclick handlers can access it
         window.supabaseClient = supabase;
 
-        // Trigger initial data loading once DOM is ready
         window.addEventListener('DOMContentLoaded', async () => {
             await checkAuthGuard();
             fetchOrders();
@@ -327,6 +323,15 @@
     <script>
         let cachedOrders = [];
         let cachedInquiries = [];
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar && backdrop) {
+                sidebar.classList.toggle('-translate-x-full');
+                backdrop.classList.toggle('hidden');
+            }
+        }
 
         async function checkAuthGuard() {
             const client = window.supabaseClient;
@@ -370,6 +375,11 @@
                 activeBtn.classList.remove('text-gray-500');
                 activeBtn.classList.add('bg-pink-50', 'text-pink-600');
             }
+
+            // Close mobile sidebar automatically on tab click
+            if (window.innerWidth < 768) {
+                toggleMobileSidebar();
+            }
         }
 
         // ==================== FETCH & MANAGE ORDERS ====================
@@ -386,7 +396,6 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error('Error fetching orders:', error.message);
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load orders: ${error.message}</td></tr>`;
                 return;
             }
@@ -484,7 +493,6 @@
             if (!order) return;
 
             const modalContent = document.getElementById('modal-content');
-
             const items = Array.isArray(order.items) ? order.items : [];
             const itemsListHtml = items.map(i => {
                 const itemColor = i.selected_color || i.color || '';
@@ -602,9 +610,7 @@
             } else {
                 if (updatedData && updatedData.length > 0) {
                     const index = cachedOrders.findIndex(o => o.id === orderId);
-                    if (index !== -1) {
-                        cachedOrders[index] = updatedData[0];
-                    }
+                    if (index !== -1) cachedOrders[index] = updatedData[0];
                 }
                 closeOrderModal();
                 fetchOrders();
@@ -741,12 +747,8 @@
                 .select('id, name, section')
                 .order('name', { ascending: true });
 
-            if (error) {
-                console.error('Error fetching categories for dropdown:', error.message);
-                return;
-            }
+            if (error) return;
 
-            // keep anything already ticked if the form is open
             const checked = new Set(
                 Array.from(document.querySelectorAll('.prod-cat-checkbox:checked')).map(c => c.value)
             );
@@ -774,7 +776,7 @@
             };
 
             render(categories.filter(c => (c.section || 'main') !== 'sub'), mainEl, 'No main categories yet.');
-            render(categories.filter(c => c.section === 'sub'), subEl, 'No sub categories yet. Create one in the Categories tab.');
+            render(categories.filter(c => c.section === 'sub'), subEl, 'No sub categories yet.');
         }
 
         async function fetchProducts() {
@@ -804,7 +806,6 @@
                     ? linked.map(c => `<span class="inline-block ${c.section === 'sub' ? 'bg-purple-50 text-purple-600' : 'bg-pink-50 text-pink-600'} text-xs px-3 py-1 rounded-full font-medium mr-1 mb-1">${c.name}</span>`).join('')
                     : '<span class="inline-block bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full font-medium mb-1">Uncategorized</span>';
 
-                // Display colors badge if configured
                 const colorsList = (Array.isArray(prod.colors) && prod.colors.length > 0)
                     ? `<div class="text-[11px] text-gray-500 mb-2 font-medium">🎨 Colors: ${prod.colors.join(', ')}</div>`
                     : '';
@@ -820,7 +821,7 @@
                         ${colorsList}
                         <p class="text-gray-500 text-xs line-clamp-2 mb-4">${prod.description || ''}</p>
                     </div>
-                    <button onclick="deleteProduct('${prod.id}')" class="absolute top-3 right-3 text-red-400 hover:text-red-600 hidden group-hover/card:block bg-red-50 rounded-full p-2 transition-colors">
+                    <button onclick="deleteProduct('${prod.id}')" class="absolute top-3 right-3 text-red-400 hover:text-red-600 md:hidden md:group-hover/card:block bg-red-50 rounded-full p-2 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
                 `;
@@ -830,10 +831,7 @@
 
         async function saveProduct() {
             const client = window.supabaseClient;
-            if (!client) {
-                alert('Supabase client is not available.');
-                return;
-            }
+            if (!client) return;
 
             const title = document.getElementById('prod-title').value.trim();
             const mainIds = Array.from(document.querySelectorAll('.prod-cat-main:checked')).map(c => c.value);
@@ -843,7 +841,6 @@
             const description = document.getElementById('prod-desc').value.trim();
             const specsRaw = document.getElementById('prod-specs').value.trim();
 
-            // Extract and format colors array from input
             const colorsRaw = document.getElementById('prod-colors').value.trim();
             const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
 
@@ -894,26 +891,25 @@
                     .from('products')
                     .insert([{
                         title,
-                        category_id: mainIds[0], // legacy column: first main category
+                        category_id: mainIds[0],
                         price,
                         description,
                         specifications,
                         images: imageUrls,
-                        colors: colors // Saves color JSON array (e.g. ["Pink", "Blue"])
+                        colors: colors
                     }])
                     .select('id')
                     .single();
 
                 if (insertError) throw insertError;
 
-                // link the product to every ticked main + sub category
                 const links = categoryIds.map(cid => ({ product_id: newProduct.id, category_id: cid }));
                 const { error: linkError } = await client
                     .from('product_categories')
                     .insert(links);
 
                 if (linkError) {
-                    await client.from('products').delete().eq('id', newProduct.id); // roll back
+                    await client.from('products').delete().eq('id', newProduct.id);
                     throw linkError;
                 }
 
@@ -980,7 +976,7 @@
                 ${cat.image_url ? `<img src="${cat.image_url}" alt="${cat.name}" class="w-20 h-20 object-cover rounded-2xl mx-auto mb-3">` : ''}
                 <h3 class="font-semibold text-gray-800 text-lg mb-2">${cat.name}</h3>
                 <span class="inline-block ${cat.section === 'sub' ? 'bg-purple-50 text-purple-600' : 'bg-pink-50 text-pink-600'} text-xs px-3 py-1 rounded-full font-medium mb-2">${cat.section === 'sub' ? 'Sub category' : 'Main category'}</span>
-                <button onclick="deleteCategory('${cat.id}')" class="absolute top-3 right-3 text-red-400 hover:text-red-600 hidden group-hover/card:block bg-red-50 rounded-full p-1 transition-colors">
+                <button onclick="deleteCategory('${cat.id}')" class="absolute top-3 right-3 text-red-400 hover:text-red-600 md:hidden md:group-hover/card:block bg-red-50 rounded-full p-1 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
             `;
@@ -1003,7 +999,7 @@
                 <label class="block text-xs font-medium text-gray-500 mb-1">Section</label>
                 <select class="cat-section-input w-full text-sm px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:border-pink-400">
                     <option value="main">Main category</option>
-                    <option value="sub">Sub category (e.g. Special for Her)</option>
+                    <option value="sub">Sub category</option>
                 </select>
             </div>
 
@@ -1013,7 +1009,7 @@
             </div>
 
             <button onclick="saveCategory(this)" class="text-xs font-medium text-white bg-gray-900 px-6 py-2 rounded-full hover:bg-gray-700 transition-colors w-full mt-2">Save Changes</button>
-            <button onclick="this.parentElement.remove(); checkEmptyCategories();" class="absolute top-3 right-3 text-red-400 hover:text-red-600 hidden group-hover/card:block bg-red-50 rounded-full p-1 transition-colors">
+            <button onclick="this.parentElement.remove(); checkEmptyCategories();" class="absolute top-3 right-3 text-red-400 hover:text-red-600 bg-red-50 rounded-full p-1 transition-colors">
                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
         `;
@@ -1023,10 +1019,7 @@
 
         async function saveCategory(btnEl) {
             const client = window.supabaseClient;
-            if (!client) {
-                alert('Supabase client failed to load.');
-                return;
-            }
+            if (!client) return;
 
             const card = btnEl.closest('div');
             const nameInput = card.querySelector('.cat-name-input');
@@ -1110,7 +1103,6 @@
             }
         }
 
-        // EXPOSE ALL HANDLERS TO GLOBAL WINDOW SCOPE FOR HTML ONCLICK ATTRIBUTES
         window.switchTab = switchTab;
         window.handleLogout = handleLogout;
         window.fetchOrders = fetchOrders;
@@ -1133,6 +1125,7 @@
         window.fetchCategories = fetchCategories;
         window.populateCategoryDropdown = populateCategoryDropdown;
         window.fetchProducts = fetchProducts;
+        window.toggleMobileSidebar = toggleMobileSidebar;
     </script>
 </body>
 
