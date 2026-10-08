@@ -561,6 +561,18 @@
 
     <!-- EXTERNAL JS -->
     <script type="module" src="script.js"></script>
+    <!-- FULLSCREEN IMAGE GALLERY OVERLAY -->
+    <div id="fullscreen-gallery" class="fixed inset-0 z-[200] hidden flex-col bg-black/95 opacity-0 transition-opacity duration-300">
+        <button onclick="closeFullscreenGallery()" class="absolute top-4 right-4 z-50 text-white/80 p-4 hover:text-white transition-colors cursor-pointer">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <div id="gallery-swipe-track" class="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar relative touch-pan-x items-center"></div>
+        
+        <button onclick="scrollGallerySlider(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">‹</button>
+        <button onclick="scrollGallerySlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">›</button>
+        
+        <div id="gallery-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-medium tracking-widest text-sm z-50 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur"></div>
+    </div>
 </body>
 
 </html>
