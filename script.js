@@ -84,6 +84,18 @@ import { supabase } from './supabaseClient.js';
     localStorage.setItem('pepe_cart', JSON.stringify(cart));
   }
 
+  function selectColor(color, btnElement) {
+    selectedColor = color;
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.classList.remove('border-pink-500', 'bg-pink-50', 'text-pink-600', 'ring-2', 'ring-pink-400');
+      btn.classList.add('border-gray-300', 'text-gray-700');
+    });
+    if (btnElement) {
+      btnElement.classList.remove('border-gray-300', 'text-gray-700');
+      btnElement.classList.add('border-pink-500', 'bg-pink-50', 'text-pink-600', 'ring-2', 'ring-pink-400');
+    }
+  }
+
   async function addToCart(productId, sourceBtnId = null, chosenColor = null) {
     const product = products.find(p => String(p.id) === String(productId));
     if (!product && !currentUser) return;
@@ -177,11 +189,12 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 3. Category Fetching with Skeletons
+  // 3. Category Fetching with GREY SKELETON LOADERS
   async function loadCategoriesAndCollections() {
     const catGrid = document.getElementById('category-grid');
     const colGrid = document.getElementById('collection-grid');
     
+    // Inject grey loading placeholders instantly on page load
     const skeletonHTML = Array(5).fill(`
       <div class="flex-none w-40 md:w-52 snap-start bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-pulse text-center">
         <div class="w-full aspect-square rounded-2xl bg-gray-200 mb-3 border border-gray-100"></div>
@@ -227,8 +240,7 @@ import { supabase } from './supabaseClient.js';
         ? `<img src="${cat.image_url}" alt="${cat.name}" draggable="false" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
         : `<div class="w-full h-full flex items-center justify-center text-3xl">🧸</div>`;
       return `
-      <div onclick="showCategoryProducts('${cat.id}', '${safeName}')"
-           class="flex-none w-40 md:w-52 snap-start group cursor-pointer bg-white rounded-3xl p-4 shadow-sm border border-white/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center select-none">
+      <div onclick="showCategoryProducts('${cat.id}', '${safeName}')" class="flex-none w-40 md:w-52 snap-start group cursor-pointer bg-white rounded-3xl p-4 shadow-sm border border-white/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center select-none">
         <div class="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-3 border border-gray-100">
           ${img}
         </div>
@@ -261,7 +273,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View
+  // 4. Primary Category Drilldown View (With Skeletons)
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -270,6 +282,33 @@ import { supabase } from './supabaseClient.js';
     const categoryTitle = document.getElementById('current-category-title');
 
     if (categoryTitle) categoryTitle.textContent = categoryName;
+
+    // Immediately show product skeletons while fetching data
+    if (productGrid) {
+      productGrid.innerHTML = Array(6).fill(`
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
+            <div class="w-full aspect-[4/5] bg-gray-200 rounded-t-[2rem]"></div>
+            <div class="p-5 flex flex-col flex-grow border-t border-gray-50 bg-white">
+                <div class="flex justify-between items-start mb-1 gap-2">
+                    <div class="h-5 bg-gray-200 rounded w-2/3"></div>
+                    <div class="h-5 bg-gray-200 rounded w-1/4"></div>
+                </div>
+                <div class="h-3 bg-gray-200 rounded w-1/3 mb-5 mt-2"></div>
+                <div class="mt-auto w-full h-12 bg-gray-200 rounded-xl"></div>
+            </div>
+        </div>
+      `).join('');
+    }
+
+    if (categoriesSection && productSection) {
+      categoriesSection.classList.add('hidden');
+      if (collectionsSection) collectionsSection.classList.add('hidden');
+      productSection.classList.remove('hidden');
+      setTimeout(() => {
+        productSection.classList.remove('opacity-0');
+        productSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 10);
+    }
 
     let categoryProds = [];
     try {
@@ -315,9 +354,9 @@ import { supabase } from './supabaseClient.js';
             <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
                 <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
                     <div id="slider-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, '${prod.id}')">
-                        ${imagesArr.map((img) => `
+                        ${imagesArr.map((img, idx) => `
                             <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
-                                <img src="${img}" alt="${prod.title}" onclick="openFullscreenGallery(${escapedImages}, 0)" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 group-hover/slider:scale-105" title="Click to view full photos">
+                                <img src="${img}" alt="${prod.title}" onclick="openFullscreenGallery(${escapedImages},${idx})" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 group-hover/slider:scale-105" title="Click to view full photos">
                             </div>
                         `).join('')}
                     </div>
@@ -353,16 +392,6 @@ import { supabase } from './supabaseClient.js';
         }).join('');
       }
     }
-
-    if (categoriesSection && productSection) {
-      categoriesSection.classList.add('hidden');
-      if (collectionsSection) collectionsSection.classList.add('hidden');
-      productSection.classList.remove('hidden');
-      setTimeout(() => {
-        productSection.classList.remove('opacity-0');
-        productSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 10);
-    }
   }
 
   function hideProducts() {
@@ -380,7 +409,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 5. Quick-View Modal Functions
+  // 5. Quick-View Modal Functions (Swipeable Track & Uncropped Images)
   function openProductModal(productId) {
     const prod = products.find(p => String(p.id) === String(productId));
     if (!prod) return;
@@ -394,6 +423,8 @@ import { supabase } from './supabaseClient.js';
     const specsList = document.getElementById('modal-specs-list');
     const thumbsContainer = document.getElementById('modal-thumbnails');
     const addCartBtn = document.getElementById('modal-add-cart-btn');
+    const colorsContainer = document.getElementById('modal-colors-container');
+    const colorsOptions = document.getElementById('modal-color-options');
 
     let images = [];
     try {
@@ -402,6 +433,34 @@ import { supabase } from './supabaseClient.js';
         images = [prod.images || 'https://via.placeholder.com/300'];
     }
 
+    const specs = Array.isArray(prod.specifications) ? prod.specifications : JSON.parse(prod.specifications || '[]');
+
+    let colors = [];
+    try {
+      colors = Array.isArray(prod.colors) ? prod.colors : JSON.parse(prod.colors || '[]');
+    } catch (e) {
+      if (typeof prod.colors === 'string') {
+        colors = prod.colors.split(',').map(c => c.trim()).filter(Boolean);
+      }
+    }
+
+    if (colorsContainer && colorsOptions) {
+      if (colors.length > 0) {
+        colorsContainer.classList.remove('hidden');
+        colorsOptions.innerHTML = colors.map(color => `
+          <button type="button" 
+                  onclick="selectColor('${color}', this)"
+                  class="color-btn border border-gray-300 rounded-full px-4 py-1.5 text-xs font-medium text-gray-700 hover:border-pink-500 transition-all">
+            ${color}
+          </button>
+        `).join('');
+      } else {
+        colorsContainer.classList.add('hidden');
+        colorsOptions.innerHTML = '';
+      }
+    }
+
+    // Modal Swipe Track Injection (object-contain ensures no cropping)
     const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
       const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
@@ -417,6 +476,13 @@ import { supabase } from './supabaseClient.js';
     if (price) price.textContent = `₹${parseFloat(prod.price).toFixed(2)}`;
     if (desc) desc.textContent = prod.description || 'No description available.';
 
+    if (specsList) {
+      specsList.innerHTML = specs.length > 0
+        ? specs.map(s => `<li>${s}</li>`).join('')
+        : '<li>No specifications listed.</li>';
+    }
+
+    // Amazon-Style Thumbnail Generation (Index-based)
     if (thumbsContainer) {
       thumbsContainer.innerHTML = images.map((img, index) => `
         <div onclick="changeModalImage(${index})" class="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-pink-500 cursor-pointer bg-white transition-all p-1">
@@ -585,6 +651,14 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
+  function scrollModalSlider(direction) {
+    const track = document.getElementById('modal-swipe-track');
+    if (track) {
+        const width = track.clientWidth;
+        track.scrollBy({ left: direction * width, behavior: 'smooth' });
+    }
+  }
+
   function changeModalImage(index) {
     const track = document.getElementById('modal-swipe-track');
     if (track) {
@@ -593,7 +667,7 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-// 9. Cutest Pepes Dynamic Interactive Showcase
+  // 9. Cutest Pepes Dynamic Interactive Showcase
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
@@ -622,7 +696,6 @@ import { supabase } from './supabaseClient.js';
         const img = imagesArr[0] || '1.png';
         const escapedImages = JSON.stringify(imagesArr).replace(/"/g, '&quot;');
 
-        // Strictly sized container prevents blow-up
         return `
           <div onclick="openFullscreenGallery(${escapedImages}, 0)" class="w-52 md:w-64 h-52 md:h-64 aspect-square bg-white rounded-[2.5rem] p-4 shadow-md hover:shadow-2xl border border-white/90 flex items-center justify-center shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-300 group overflow-hidden" title="Click to view full photos">
               <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain rounded-3xl select-none pointer-events-none group-hover:scale-105 transition-transform duration-500">
@@ -646,6 +719,7 @@ import { supabase } from './supabaseClient.js';
   window.selectColor = selectColor;
   window.updateSliderDots = updateSliderDots;
   window.scrollProductSlider = scrollProductSlider;
+  window.scrollModalSlider = scrollModalSlider;
   window.changeModalImage = changeModalImage;
   window.openFullscreenGallery = openFullscreenGallery;
   window.closeFullscreenGallery = closeFullscreenGallery;
