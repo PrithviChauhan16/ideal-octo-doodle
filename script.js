@@ -432,8 +432,7 @@ import { supabase } from './supabaseClient.js';
       }
     }
 
-    // Modal track generation integrating the Fullscreen Gallery trigger
-    const modalSwipeTrack = document.getElementById('modal-swipe-track');
+const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
       const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
       modalSwipeTrack.innerHTML = images.map((img, index) => `
@@ -441,7 +440,7 @@ import { supabase } from './supabaseClient.js';
               <img src="${img}" onclick="openFullscreenGallery(${escapedImages}, ${index})" class="w-full h-full object-contain cursor-zoom-in active:opacity-75 transition-opacity" title="Tap to expand">
           </div>
       `).join('');
-      modalSwipeTrack.scrollLeft = 0;
+      modalSwipeTrack.scrollLeft = 0; 
     }
 
     if (title) title.textContent = prod.title;
