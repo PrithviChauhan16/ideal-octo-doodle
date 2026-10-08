@@ -63,6 +63,21 @@
                 background-attachment: fixed;
             }
         }
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .animate-marquee {
+            display: flex;
+            width: max-content;
+            animation: marquee 25s linear infinite;
+        }
+
+        /* Pause animation when user hovers over the showcase */
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 
