@@ -194,8 +194,22 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 3. Category Fetching
+ // 3. Category Fetching with Skeleton Loaders
   async function loadCategoriesAndCollections() {
+    const catGrid = document.getElementById('category-grid');
+    const colGrid = document.getElementById('collection-grid');
+    
+    // Inject grey loading placeholders instantly
+    const skeletonHTML = Array(5).fill(`
+      <div class="flex-none w-40 md:w-52 snap-start bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-pulse text-center">
+        <div class="w-full aspect-square rounded-2xl bg-gray-200 mb-3 border border-gray-100"></div>
+        <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mt-2"></div>
+      </div>
+    `).join('');
+
+    if (catGrid) catGrid.innerHTML = skeletonHTML;
+    if (colGrid) colGrid.innerHTML = skeletonHTML;
+
     try {
       const { data: categoriesData, error: catError } = await supabase
         .from('categories')
@@ -616,11 +630,45 @@ import { supabase } from './supabaseClient.js';
         }
         const img = imagesArr[0] || '1.png';
 
-        return `
-          <div onclick="openProductModal('${prod.id}')" class="w-52 md:w-64 aspect-square bg-white rounded-[2.5rem] p-4 shadow-md hover:shadow-2xl border border-white/90 flex items-center justify-center shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-300 group overflow-hidden">
-              <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain rounded-3xl select-none pointer-events-none group-hover:scale-105 transition-transform duration-500">
-          </div>
-        `;
+       return `
+            <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
+                <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
+                    <div id="slider-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, '${prod.id}')">
+                        ${imagesArr.map((img) => `
+                            <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
+                                <img src="${img}" alt="${prod.title}" onclick="openProductModal('${prod.id}')" class="w-full h-full object-contain cursor-pointer transition-transform duration-500 group-hover/slider:scale-105">
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${imagesArr.length > 1 ? `
+                        <button onclick="scrollProductSlider(event, '${prod.id}', -1)" class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-30 pb-1 text-xl leading-none cursor-pointer">‹</button>
+                        <button onclick="scrollProductSlider(event, '${prod.id}', 1)" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-30 pb-1 text-xl leading-none cursor-pointer">›</button>
+                        
+                        <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/10 to-transparent pointer-events-none rounded-b-2xl z-20"></div>
+                        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 pointer-events-none z-30" id="dots-${prod.id}">
+                            ${imagesArr.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white scale-125' : 'bg-white/60'} shadow-sm border border-gray-300/30"></span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
+                    <div class="flex justify-between items-start mb-1 gap-2">
+                        <h3 onclick="openProductModal('${prod.id}')" class="font-semibold text-gray-900 cursor-pointer hover:text-pink-500 transition-colors text-base md:text-lg line-clamp-2 leading-tight flex-grow">
+                            ${prod.title}
+                        </h3>
+                        <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
+                    </div>
+                    
+                    <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Premium Plushie'}</p>
+                    
+                    <button id="btn-${prod.id}" onclick="addToCart('${prod.id}', 'btn-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
+                        <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+          `;
       }).join('');
 
       track.innerHTML = cardsHTML + cardsHTML;
