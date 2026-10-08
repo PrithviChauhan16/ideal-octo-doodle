@@ -50,7 +50,6 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // Fetch cart count & items from Supabase
   async function fetchUserCartFromSupabase() {
     if (!currentUser) return;
 
@@ -76,7 +75,6 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 2. Cart Functions
   function updateCartUI() {
     const count = cart.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
     ['cart-count', 'cart-count-mobile'].forEach(id => {
@@ -84,18 +82,6 @@ import { supabase } from './supabaseClient.js';
       if (el) el.textContent = count;
     });
     localStorage.setItem('pepe_cart', JSON.stringify(cart));
-  }
-
-  function selectColor(color, btnElement) {
-    selectedColor = color;
-    document.querySelectorAll('.color-btn').forEach(btn => {
-      btn.classList.remove('border-pink-500', 'bg-pink-50', 'text-pink-600', 'ring-2', 'ring-pink-400');
-      btn.classList.add('border-gray-300', 'text-gray-700');
-    });
-    if (btnElement) {
-      btnElement.classList.remove('border-gray-300', 'text-gray-700');
-      btnElement.classList.add('border-pink-500', 'bg-pink-50', 'text-pink-600', 'ring-2', 'ring-pink-400');
-    }
   }
 
   async function addToCart(productId, sourceBtnId = null, chosenColor = null) {
@@ -141,7 +127,6 @@ import { supabase } from './supabaseClient.js';
         }
 
         const { data: existingItem, error: fetchErr } = await query.maybeSingle();
-
         if (fetchErr) throw fetchErr;
 
         if (existingItem) {
@@ -150,7 +135,6 @@ import { supabase } from './supabaseClient.js';
             .from('cart')
             .update({ quantity: newQty, updated_at: new Date().toISOString() })
             .eq('id', existingItem.id);
-
           if (updateErr) throw updateErr;
         } else {
           const { error: insertErr } = await supabase
@@ -161,7 +145,6 @@ import { supabase } from './supabaseClient.js';
               quantity: 1,
               selected_color: chosenColor || null
             }]);
-
           if (insertErr) throw insertErr;
         }
 
@@ -194,12 +177,11 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
- // 3. Category Fetching with Skeleton Loaders
+  // 3. Category Fetching with Skeletons
   async function loadCategoriesAndCollections() {
     const catGrid = document.getElementById('category-grid');
     const colGrid = document.getElementById('collection-grid');
     
-    // Inject grey loading placeholders instantly
     const skeletonHTML = Array(5).fill(`
       <div class="flex-none w-40 md:w-52 snap-start bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-pulse text-center">
         <div class="w-full aspect-square rounded-2xl bg-gray-200 mb-3 border border-gray-100"></div>
@@ -279,7 +261,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View with Swipeable, Uncropped Cards
+  // 4. Primary Category Drilldown View
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -327,15 +309,15 @@ import { supabase } from './supabaseClient.js';
              imagesArr = [prod.images || 'https://via.placeholder.com/300'];
           }
 
+          const escapedImages = JSON.stringify(imagesArr).replace(/"/g, '&quot;');
+
           return `
             <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
-                
-                <div class="relative w-full aspect-[4/5] bg-gray-50 overflow-hidden group/slider rounded-t-[2rem]">
-                    
+                <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
                     <div id="slider-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, '${prod.id}')">
                         ${imagesArr.map((img) => `
                             <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
-                                <img src="${img}" alt="${prod.title}" onclick="openProductModal('${prod.id}')" class="w-full h-full object-contain cursor-pointer transition-transform duration-500 group-hover/slider:scale-105">
+                                <img src="${img}" alt="${prod.title}" onclick="openFullscreenGallery(${escapedImages}, 0)" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 group-hover/slider:scale-105" title="Click to view full photos">
                             </div>
                         `).join('')}
                     </div>
@@ -412,8 +394,6 @@ import { supabase } from './supabaseClient.js';
     const specsList = document.getElementById('modal-specs-list');
     const thumbsContainer = document.getElementById('modal-thumbnails');
     const addCartBtn = document.getElementById('modal-add-cart-btn');
-    const colorsContainer = document.getElementById('modal-colors-container');
-    const colorsOptions = document.getElementById('modal-color-options');
 
     let images = [];
     try {
@@ -422,38 +402,12 @@ import { supabase } from './supabaseClient.js';
         images = [prod.images || 'https://via.placeholder.com/300'];
     }
 
-    const specs = Array.isArray(prod.specifications) ? prod.specifications : JSON.parse(prod.specifications || '[]');
-
-    let colors = [];
-    try {
-      colors = Array.isArray(prod.colors) ? prod.colors : JSON.parse(prod.colors || '[]');
-    } catch (e) {
-      if (typeof prod.colors === 'string') {
-        colors = prod.colors.split(',').map(c => c.trim()).filter(Boolean);
-      }
-    }
-
-    if (colorsContainer && colorsOptions) {
-      if (colors.length > 0) {
-        colorsContainer.classList.remove('hidden');
-        colorsOptions.innerHTML = colors.map(color => `
-          <button type="button" 
-                  onclick="selectColor('${color}', this)"
-                  class="color-btn border border-gray-300 rounded-full px-4 py-1.5 text-xs font-medium text-gray-700 hover:border-pink-500 transition-all">
-            ${color}
-          </button>
-        `).join('');
-      } else {
-        colorsContainer.classList.add('hidden');
-        colorsOptions.innerHTML = '';
-      }
-    }
-
     const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
-      modalSwipeTrack.innerHTML = images.map(img => `
+      const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
+      modalSwipeTrack.innerHTML = images.map((img, index) => `
           <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
-              <img src="${img}" class="w-full h-full object-contain">
+              <img src="${img}" onclick="openFullscreenGallery(${escapedImages}, ${index})" class="w-full h-full object-contain cursor-zoom-in" title="Tap to expand fullscreen">
           </div>
       `).join('');
       modalSwipeTrack.scrollLeft = 0;
@@ -462,12 +416,6 @@ import { supabase } from './supabaseClient.js';
     if (title) title.textContent = prod.title;
     if (price) price.textContent = `₹${parseFloat(prod.price).toFixed(2)}`;
     if (desc) desc.textContent = prod.description || 'No description available.';
-
-    if (specsList) {
-      specsList.innerHTML = specs.length > 0
-        ? specs.map(s => `<li>${s}</li>`).join('')
-        : '<li>No specifications listed.</li>';
-    }
 
     if (thumbsContainer) {
       thumbsContainer.innerHTML = images.map((img, index) => `
@@ -500,7 +448,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 6. Contact Form Inquiry Submission
+  // 6. Contact Form Inquiry Submission (Restricted to Signed-In Users)
   async function handleContactSubmit(event) {
     event.preventDefault();
 
@@ -557,7 +505,58 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 7. Swiping UI Helpers
+  // 7. Fullscreen Gallery Zoom Logic
+  function openFullscreenGallery(images, startIndex) {
+    const gallery = document.getElementById('fullscreen-gallery');
+    const track = document.getElementById('gallery-swipe-track');
+    if (!gallery || !track) return;
+
+    track.innerHTML = images.map((img) => `
+        <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4 md:p-12">
+            <img src="${img}" class="max-w-full max-h-full object-contain select-none">
+        </div>
+    `).join('');
+
+    gallery.classList.remove('hidden');
+    gallery.classList.add('flex');
+    
+    setTimeout(() => {
+        gallery.classList.remove('opacity-0');
+        const width = track.clientWidth;
+        track.scrollTo({ left: startIndex * width, behavior: 'instant' });
+        updateGalleryCounter(startIndex, images.length);
+    }, 10);
+
+    track.onscroll = () => {
+        const activeIndex = Math.round(track.scrollLeft / track.clientWidth);
+        updateGalleryCounter(activeIndex, images.length);
+    };
+  }
+
+  function updateGalleryCounter(index, total) {
+      const counter = document.getElementById('gallery-counter');
+      if (counter) counter.innerText = `${index + 1} / ${total}`;
+  }
+
+  function closeFullscreenGallery() {
+      const gallery = document.getElementById('fullscreen-gallery');
+      if (!gallery) return;
+      gallery.classList.add('opacity-0');
+      setTimeout(() => {
+          gallery.classList.add('hidden');
+          gallery.classList.remove('flex');
+      }, 300);
+  }
+
+  function scrollGallerySlider(direction) {
+      const track = document.getElementById('gallery-swipe-track');
+      if (track) {
+          const width = track.clientWidth;
+          track.scrollBy({ left: direction * width, behavior: 'smooth' });
+      }
+  }
+
+  // 8. Swiping UI Helpers
   function updateSliderDots(event, productId) {
     const container = event.target;
     const scrollLeft = container.scrollLeft;
@@ -586,14 +585,6 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  function scrollModalSlider(direction) {
-    const track = document.getElementById('modal-swipe-track');
-    if (track) {
-        const width = track.clientWidth;
-        track.scrollBy({ left: direction * width, behavior: 'smooth' });
-    }
-  }
-
   function changeModalImage(index) {
     const track = document.getElementById('modal-swipe-track');
     if (track) {
@@ -602,7 +593,7 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 8. Cutest Pepes Dynamic Interactive Showcase
+  // 9. Cutest Pepes Dynamic Interactive Showcase
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
@@ -629,46 +620,13 @@ import { supabase } from './supabaseClient.js';
           imagesArr = [prod.images || '1.png'];
         }
         const img = imagesArr[0] || '1.png';
+        const escapedImages = JSON.stringify(imagesArr).replace(/"/g, '&quot;');
 
-       return `
-            <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
-                <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
-                    <div id="slider-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, '${prod.id}')">
-                        ${imagesArr.map((img) => `
-                            <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
-                                <img src="${img}" alt="${prod.title}" onclick="openProductModal('${prod.id}')" class="w-full h-full object-contain cursor-pointer transition-transform duration-500 group-hover/slider:scale-105">
-                            </div>
-                        `).join('')}
-                    </div>
-                    
-                    ${imagesArr.length > 1 ? `
-                        <button onclick="scrollProductSlider(event, '${prod.id}', -1)" class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-30 pb-1 text-xl leading-none cursor-pointer">‹</button>
-                        <button onclick="scrollProductSlider(event, '${prod.id}', 1)" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 border border-gray-200 backdrop-blur hover:bg-gray-50 text-gray-900 w-8 h-8 rounded-full items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-all shadow-md z-30 pb-1 text-xl leading-none cursor-pointer">›</button>
-                        
-                        <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/10 to-transparent pointer-events-none rounded-b-2xl z-20"></div>
-                        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 pointer-events-none z-30" id="dots-${prod.id}">
-                            ${imagesArr.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white scale-125' : 'bg-white/60'} shadow-sm border border-gray-300/30"></span>`).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-
-                <div class="p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
-                    <div class="flex justify-between items-start mb-1 gap-2">
-                        <h3 onclick="openProductModal('${prod.id}')" class="font-semibold text-gray-900 cursor-pointer hover:text-pink-500 transition-colors text-base md:text-lg line-clamp-2 leading-tight flex-grow">
-                            ${prod.title}
-                        </h3>
-                        <p class="text-pink-500 font-bold text-base md:text-lg whitespace-nowrap mt-0.5">₹${parseFloat(prod.price).toFixed(2)}</p>
-                    </div>
-                    
-                    <p class="text-gray-400 text-xs md:text-sm mb-5 mt-1 line-clamp-1">${prod.category || 'Premium Plushie'}</p>
-                    
-                    <button id="btn-${prod.id}" onclick="addToCart('${prod.id}', 'btn-${prod.id}')" class="mt-auto w-full bg-brand-900 text-white py-3 rounded-xl text-sm font-semibold hover:bg-pink-500 active:scale-95 transition-all shadow-md flex justify-center items-center gap-2 group/btn">
-                        <svg class="w-4 h-4 group-hover/btn:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        Add to Cart
-                    </button>
-                </div>
-            </div>
-          `;
+        return `
+          <div onclick="openFullscreenGallery(${escapedImages}, 0)" class="w-52 md:w-64 aspect-square bg-white rounded-[2.5rem] p-4 shadow-md hover:shadow-2xl border border-white/90 flex items-center justify-center shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-300 group overflow-hidden" title="Click to view full photos">
+              <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain rounded-3xl select-none pointer-events-none group-hover:scale-105 transition-transform duration-500">
+          </div>
+        `;
       }).join('');
 
       track.innerHTML = cardsHTML + cardsHTML;
@@ -677,7 +635,7 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 9. Expose global handlers needed for inline onclick attributes in HTML
+  // 10. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
   window.scrollCategoryRow = scrollCategoryRow;
@@ -687,8 +645,10 @@ import { supabase } from './supabaseClient.js';
   window.selectColor = selectColor;
   window.updateSliderDots = updateSliderDots;
   window.scrollProductSlider = scrollProductSlider;
-  window.scrollModalSlider = scrollModalSlider;
   window.changeModalImage = changeModalImage;
+  window.openFullscreenGallery = openFullscreenGallery;
+  window.closeFullscreenGallery = closeFullscreenGallery;
+  window.scrollGallerySlider = scrollGallerySlider;
   window.loadCutestPepesShowcase = loadCutestPepesShowcase;
 
   // Initialize on page load
