@@ -436,11 +436,15 @@ import { supabase } from './supabaseClient.js';
     // New Swipeable Modal Track Injection
    const modalSwipeTrack = document.getElementById('modal-swipe-track');
     
-    // Inject the main photos with a window.open click/tap event for zooming on all devices
+// New Swipeable Modal Track Injection
+    const modalSwipeTrack = document.getElementById('modal-swipe-track');
     if (modalSwipeTrack) {
-      modalSwipeTrack.innerHTML = images.map(img => `
+      // Escape the array so it can be safely passed inside the onclick attribute
+      const escapedImages = JSON.stringify(images).replace(/"/g, '&quot;');
+      
+      modalSwipeTrack.innerHTML = images.map((img, index) => `
           <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
-              <img src="${img}" onclick="window.open('${img}', '_blank')" class="w-full h-full object-contain cursor-zoom-in active:opacity-75 transition-opacity" title="Tap to zoom">
+              <img src="${img}" onclick="openFullscreenGallery(${escapedImages}, ${index})" class="w-full h-full object-contain cursor-zoom-in active:opacity-75 transition-opacity" title="Tap to expand">
           </div>
       `).join('');
       modalSwipeTrack.scrollLeft = 0; // Reset scroll to first image
@@ -581,6 +585,62 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
+  // 9. Fullscreen Gallery Logic
+  function openFullscreenGallery(images, startIndex) {
+    const gallery = document.getElementById('fullscreen-gallery');
+    const track = document.getElementById('gallery-swipe-track');
+    if (!gallery || !track) return;
+
+    // Inject the photos into the fullscreen track
+    track.innerHTML = images.map((img) => `
+        <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4 md:p-12">
+            <img src="${img}" class="max-w-full max-h-full object-contain select-none">
+        </div>
+    `).join('');
+
+    // Open the overlay
+    gallery.classList.remove('hidden');
+    gallery.classList.add('flex');
+    
+    setTimeout(() => {
+        gallery.classList.remove('opacity-0');
+        
+        // Immediately snap to the image the user actually clicked
+        const width = track.clientWidth;
+        track.scrollTo({ left: startIndex * width, behavior: 'instant' });
+        updateGalleryCounter(startIndex, images.length);
+    }, 10);
+
+    // Track swiping to update the counter
+    track.onscroll = () => {
+        const activeIndex = Math.round(track.scrollLeft / track.clientWidth);
+        updateGalleryCounter(activeIndex, images.length);
+    };
+  }
+
+  function updateGalleryCounter(index, total) {
+      const counter = document.getElementById('gallery-counter');
+      if (counter) counter.innerText = `${index + 1} / ${total}`;
+  }
+
+  function closeFullscreenGallery() {
+      const gallery = document.getElementById('fullscreen-gallery');
+      if (!gallery) return;
+      gallery.classList.add('opacity-0');
+      setTimeout(() => {
+          gallery.classList.add('hidden');
+          gallery.classList.remove('flex');
+      }, 300);
+  }
+
+  function scrollGallerySlider(direction) {
+      const track = document.getElementById('gallery-swipe-track');
+      if (track) {
+          const width = track.clientWidth;
+          track.scrollBy({ left: direction * width, behavior: 'smooth' });
+      }
+  }
+  
   // 8. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
