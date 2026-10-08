@@ -659,6 +659,7 @@ import { supabase } from './supabaseClient.js';
           track.scrollBy({ left: direction * width, behavior: 'smooth' });
       }
   }
+// 11. Cutest Pepes Dynamic Interactive Showcase
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
@@ -687,13 +688,12 @@ import { supabase } from './supabaseClient.js';
         `;
       }).join('');
 
-      // Duplicate once for infinite loop effect
+      // Duplicate once for seamless infinite loop effect
       track.innerHTML = cardsHTML + cardsHTML;
     } catch (err) {
-      console.error('Error loading showcase:', err);
+      console.error('Error loading Cutest Pepes showcase:', err);
     }
   }
-
   // 9. Expose global handlers needed for inline onclick attributes in HTML
   window.showCategoryProducts = showCategoryProducts;
   window.hideProducts = hideProducts;
