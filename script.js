@@ -266,7 +266,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View
+  // 4. Primary Category Drilldown View (Upgraded UI with Uncropped Swipe Cards)
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -316,7 +316,9 @@ import { supabase } from './supabaseClient.js';
 
           return `
             <div class="product-card bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden">
+                
                 <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[2rem]">
+                    
                     <div id="slider-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, '${prod.id}')">
                         ${imagesArr.map((img) => `
                             <div class="w-full h-full flex-none snap-center flex items-center justify-center p-4">
@@ -383,7 +385,7 @@ import { supabase } from './supabaseClient.js';
     }, 300);
   }
 
-  // 5. Quick-View Modal Functions
+  // 5. Quick-View Modal Functions (Upgraded Swipeable Modal)
   function openProductModal(productId) {
     const prod = products.find(p => String(p.id) === String(productId));
     if (!prod) return;
@@ -587,7 +589,7 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 8. Cutest Pepes Interactive Dynamic Showcase Loader
+  // 8. Cutest Pepes Dynamic Interactive Showcase
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
@@ -600,7 +602,6 @@ import { supabase } from './supabaseClient.js';
 
       if (!promoProducts || promoProducts.length === 0) return;
 
-      // Also ensure these products are added to global products array so modal finds them
       promoProducts.forEach(p => {
         if (!products.some(existing => existing.id === p.id)) {
           products.push(p);
@@ -617,13 +618,12 @@ import { supabase } from './supabaseClient.js';
         const img = imagesArr[0] || '1.png';
 
         return `
-          <div onclick="openProductModal('${prod.id}')" class="w-48 md:w-60 aspect-square bg-white rounded-3xl p-3 shadow-sm border border-white/80 flex items-center justify-center shrink-0 cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all">
-              <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain rounded-2xl select-none pointer-events-none">
+          <div onclick="openProductModal('${prod.id}')" class="w-52 md:w-64 aspect-square bg-white rounded-[2.5rem] p-4 shadow-md hover:shadow-2xl border border-white/90 flex items-center justify-center shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-300 group overflow-hidden">
+              <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain rounded-3xl select-none pointer-events-none group-hover:scale-105 transition-transform duration-500">
           </div>
         `;
       }).join('');
 
-      // Duplicate once for seamless infinite loop effect
       track.innerHTML = cardsHTML + cardsHTML;
     } catch (err) {
       console.error('Error loading Cutest Pepes showcase:', err);
