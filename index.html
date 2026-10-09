@@ -7,7 +7,12 @@
     <title>PEPE KUN | Discover Softness</title>
     <!-- Fixes the favicon 404 error -->
     <link rel="icon" href="1pepe-logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts: Outfit (Sans) and Playfair Display (Serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
@@ -15,7 +20,10 @@
             tailwind.config = {
                 theme: {
                     extend: {
-                        fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                        fontFamily: { 
+                            sans: ['Outfit', 'sans-serif'],
+                            serif: ['"Playfair Display"', 'serif']
+                        },
                         colors: { brand: { 50: '#fdfbf7', 900: '#1a1a1a' } },
                         keyframes: {
                             float: {
@@ -221,7 +229,8 @@
             <!-- MAIN CATEGORIES -->
             <section id="categories" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16 transition-all duration-500">
                 <div class="text-center mb-8">
-                    <h2 class="text-2xl md:text-3xl font-medium tracking-wide text-gray-900">Choose Your Companion</h2>
+                    <!-- ELEGANT FONT UPDATED HERE -->
+                    <h2 class="text-3xl md:text-4xl font-serif italic font-semibold tracking-wide text-gray-900">Choose Your Companion</h2>
                 </div>
                 <div class="relative">
                     <button type="button" data-arrow="left" onclick="scrollCategoryRow('category-grid', -1)" aria-label="Scroll left"
@@ -238,7 +247,8 @@
             <section class="py-16 md:py-20 overflow-hidden w-full relative">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 mb-10 text-center">
                     <span class="inline-block bg-pink-100 text-pink-600 text-xs font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full border border-pink-200 shadow-sm">Our Favorites</span>
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mt-3 tracking-tight">Cutest Pepes</h2>
+                    <!-- ELEGANT FONT UPDATED HERE -->
+                    <h2 class="text-3xl md:text-4xl font-serif italic font-semibold text-gray-900 mt-3 tracking-tight">Cutest Pepes</h2>
                     <p class="text-gray-500 text-sm md:text-base mt-2">Tap any adorable companion to view full photos</p>
                 </div>
                 <div class="relative w-full overflow-hidden py-4">
@@ -251,7 +261,8 @@
             <!-- SUB CATEGORIES / COLLECTIONS -->
             <section id="collections-section" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
                 <div class="text-center mb-6">
-                    <h2 class="text-xl md:text-2xl font-semibold tracking-wide text-gray-900">Curated Collections</h2>
+                    <!-- ELEGANT FONT UPDATED HERE -->
+                    <h2 class="text-2xl md:text-3xl font-serif italic font-semibold tracking-wide text-gray-900">Curated Collections</h2>
                 </div>
                 <div class="relative">
                     <button type="button" data-arrow="left" onclick="scrollCategoryRow('collection-grid', -1)" aria-label="Scroll left"
@@ -267,7 +278,8 @@
             <!-- PRODUCT DISPLAY GRID -->
             <section id="product-display" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-24 hidden opacity-0 transition-opacity duration-500">
                 <div class="flex items-center justify-between mb-8 md:mb-10 border-b border-gray-300 pb-4">
-                    <h2 id="current-category-title" class="text-xl md:text-2xl font-semibold text-gray-900">Products</h2>
+                    <!-- ELEGANT FONT UPDATED HERE -->
+                    <h2 id="current-category-title" class="text-2xl md:text-3xl font-serif italic font-semibold text-gray-900">Products</h2>
                     <button onclick="hideProducts()" class="text-xs md:text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors border border-gray-300 rounded-full px-4 md:px-5 py-2 bg-white/80 backdrop-blur hover:bg-white shadow-sm">
                         ← Back
                     </button>
@@ -576,7 +588,6 @@
         <div id="gallery-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-medium tracking-widest text-sm z-50 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur"></div>
     </div>
 
-    <!-- SCRIPT LOGIC FOR BANNER & SHOWCASE CARDS -->
     <script>
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
@@ -675,7 +686,6 @@
         }, 6000);
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Only activate random flipping on mobile screens for trust badges
             if (window.innerWidth < 768) {
                 const trustCards = document.querySelectorAll('.trust-card');
                 
@@ -683,7 +693,7 @@
                     trustCards.forEach(card => card.style.transform = '');
                     const randomCard = trustCards[Math.floor(Math.random() * trustCards.length)];
                     randomCard.style.transform = 'rotateY(180deg)';
-                }, 3000);
+                }, 3000); 
             }
         });
     </script>
