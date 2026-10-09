@@ -225,38 +225,46 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  function renderCategoryRow(containerId, list, emptyMessage) {
+function renderCategoryRow(containerId, list, emptyMessage) {
     const row = document.getElementById(containerId);
     if (!row) return;
 
     if (list.length === 0) {
-      row.innerHTML = `<p class="text-gray-500 w-full text-center py-6">${emptyMessage}</p>`;
-      updateRowArrows(row);
-      return;
+        row.innerHTML = `<p class="text-gray-500 w-full text-center py-6">${emptyMessage}</p>`;
+        updateRowArrows(row);
+        return;
     }
 
     row.innerHTML = list.map(cat => {
-      const safeName = String(cat.name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-      const img = cat.image_url
-        ? `<img src="${cat.image_url}" alt="${cat.name}" draggable="false" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
-        : `<div class="w-full h-full flex items-center justify-center text-3xl">🧸</div>`;
-      return `
-      <div onclick="showCategoryProducts('${cat.id}', '${safeName}')" class="flex-none w-40 md:w-52 snap-start group cursor-pointer bg-white rounded-3xl p-4 shadow-sm border border-white/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center select-none">
-        <div class="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-3 border border-gray-100">
-          ${img}
-        </div>
-        <h3 class="text-base md:text-lg font-semibold text-gray-900 group-hover:text-pink-500 transition-colors truncate">${cat.name}</h3>
-      </div>`;
+        const safeName = String(cat.name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const img = cat.image_url
+            ? `<img src="${cat.image_url}" alt="${cat.name}" draggable="false" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
+            : `<div class="w-full h-full flex items-center justify-center text-5xl">🧸</div>`;
+        
+        return `
+        <div onclick="showCategoryProducts('${cat.id}', '${safeName}')"
+             class="flex-none w-40 md:w-52 snap-start group cursor-pointer bg-white rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center select-none overflow-hidden flex flex-col">
+            
+            <!-- Image spans full width (Flush Edges) -->
+            <div class="w-full aspect-square bg-gray-50 overflow-hidden relative border-b border-gray-100">
+                ${img}
+            </div>
+            
+            <!-- Text Area -->
+            <div class="p-4 pt-3 mt-auto">
+                <h3 class="text-base md:text-lg font-semibold text-gray-900 group-hover:text-pink-500 transition-colors truncate">${cat.name}</h3>
+            </div>
+        </div>`;
     }).join('');
 
     row.scrollLeft = 0;
     if (!row.dataset.bound) {
-      row.dataset.bound = '1';
-      row.addEventListener('scroll', () => updateRowArrows(row), { passive: true });
-      window.addEventListener('resize', () => updateRowArrows(row));
+        row.dataset.bound = '1';
+        row.addEventListener('scroll', () => updateRowArrows(row), { passive: true });
+        window.addEventListener('resize', () => updateRowArrows(row));
     }
     updateRowArrows(row);
-  }
+}
 
   function updateRowArrows(row) {
     const wrap = row.parentElement;
