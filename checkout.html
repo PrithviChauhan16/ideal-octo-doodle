@@ -94,14 +94,18 @@
                 <!-- Items populated via JS -->
             </div>
 
+            <!-- UPDATED TOTALS AREA -->
             <div class="border-t border-gray-100 pt-4 space-y-2 text-sm">
-                <div class="flex justify-between text-gray-600">
-                    <span>Subtotal</span>
+                <div class="flex justify-between items-center text-gray-600">
+                    <div>
+                        <span>Subtotal</span>
+                        <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded ml-1 font-medium">GST Included</span>
+                    </div>
                     <span id="summary-subtotal">₹0.00</span>
                 </div>
-                <div class="flex justify-between text-gray-600">
+                <div class="flex justify-between items-center text-gray-600">
                     <span>Shipping</span>
-                    <span class="text-green-600 font-medium">FREE</span>
+                    <span id="summary-shipping" class="text-gray-900 font-medium">₹0.00</span>
                 </div>
                 <div class="flex justify-between text-base font-bold text-gray-900 border-t pt-3">
                     <span>Total Amount</span>
@@ -122,6 +126,7 @@
         let currentUser = null;
         let cartItems = [];
         let totalAmount = 0;
+        let finalAmount = 0; // Added variable to track Subtotal + Shipping
 
         async function initCheckout() {
             const { data: { user } } = await supabase.auth.getUser();
@@ -161,6 +166,7 @@
             }
         }
 
+        // UPDATED LOGIC TO HANDLE DYNAMIC SHIPPING & TOTALS
         function renderOrderSummary() {
             const container = document.getElementById('checkout-cart-items');
             totalAmount = 0;
@@ -184,10 +190,24 @@
                 `;
             }).join('');
 
-            document.getElementById('summary-subtotal').innerText = `₹${totalAmount.toFixed(2)}`;
-            document.getElementById('summary-total').innerText = `₹${totalAmount.toFixed(2)}`;
+            // CALCULATE SHIPPING: ₹90 if subtotal is under ₹1000, otherwise FREE
+            const shippingFee = totalAmount >= 1000 ? 0 : 90;
+            finalAmount = totalAmount + shippingFee;
 
-            const upiString = `upi://pay?pa=${MERCHANT_UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${totalAmount.toFixed(2)}&cu=INR`;
+            // UPDATE UI
+            document.getElementById('summary-subtotal').innerText = `₹${totalAmount.toFixed(2)}`;
+            
+            const shippingElement = document.getElementById('summary-shipping');
+            if (shippingFee === 0) {
+                shippingElement.innerHTML = '<span class="text-green-600 font-medium tracking-wide">FREE</span>';
+            } else {
+                shippingElement.innerHTML = `₹${shippingFee.toFixed(2)}`;
+            }
+
+            document.getElementById('summary-total').innerText = `₹${finalAmount.toFixed(2)}`;
+
+            // UPDATE UPI QR WITH NEW FINAL AMOUNT (Including Shipping)
+            const upiString = `upi://pay?pa=${MERCHANT_UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${finalAmount.toFixed(2)}&cu=INR`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiString)}`;
             document.getElementById('upi-qr').src = qrApiUrl;
         }
@@ -215,7 +235,7 @@
                         shipping_address,
                         transaction_id,
                         items: cartItems,
-                        total_amount: totalAmount,
+                        total_amount: finalAmount, // Save the accurate total to DB
                         status: 'Pending Verification'
                     }
                 ]);
