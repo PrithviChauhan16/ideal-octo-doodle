@@ -154,13 +154,17 @@
 <section class="py-12 bg-white/50 backdrop-blur-sm border-y border-pink-50/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
         
-        <!-- Card 1: Cotton -->
+        <!-- Card 1: Cotton (With Photo Example) -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
-            <div class="relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
+            <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer overflow-hidden">
                 <!-- Front -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                    <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110">☁️</span>
-                    <h4 class="text-xs md:text-sm font-bold text-gray-900 tracking-wide uppercase">Ultra-Soft</h4>
+                    
+                    <!-- To use your own photo, uncomment the image below and delete the emoji -->
+                    <!-- <img src="your-photo.png" alt="Ultra Soft" class="absolute inset-0 w-full h-full object-cover opacity-30 z-0"> -->
+                    
+                    <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110 relative z-10">☁️</span>
+                    <h4 class="text-xs md:text-sm font-bold text-gray-900 tracking-wide uppercase relative z-10">Ultra-Soft</h4>
                 </div>
                 <!-- Back -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl bg-gradient-to-br from-pink-400 to-pink-500 text-white [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center p-4 shadow-lg border border-pink-400">
@@ -172,7 +176,7 @@
 
         <!-- Card 2: Washable -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
-            <div class="relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
+            <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
                 <!-- Front -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                     <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110">🧼</span>
@@ -188,7 +192,7 @@
 
         <!-- Card 3: Hand-Finished -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
-            <div class="relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
+            <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
                 <!-- Front -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                     <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110">✨</span>
@@ -204,7 +208,7 @@
 
         <!-- Card 4: Secure Checkout -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
-            <div class="relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
+            <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
                 <!-- Front -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                     <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110">🔒</span>
@@ -641,6 +645,24 @@
         <button onclick="scrollGallerySlider(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 border border-white/20 hover:bg-white/20 text-white w-12 h-12 rounded-full items-center justify-center transition-all z-50 text-3xl pb-1 cursor-pointer backdrop-blur">›</button>
         <div id="gallery-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-medium tracking-widest text-sm z-50 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur"></div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Only activate random flipping on mobile screens
+        if (window.innerWidth < 768) {
+            const trustCards = document.querySelectorAll('.trust-card');
+            
+            setInterval(() => {
+                // Reset all cards to the front
+                trustCards.forEach(card => card.style.transform = '');
+                
+                // Pick one random card to flip to the back
+                const randomCard = trustCards[Math.floor(Math.random() * trustCards.length)];
+                randomCard.style.transform = 'rotateY(180deg)';
+                
+            }, 3000); // Flips a new card every 3 seconds
+        }
+    });
+</script>
 </body>
 
 </html>
