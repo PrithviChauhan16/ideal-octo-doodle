@@ -274,7 +274,7 @@ import { supabase } from './supabaseClient.js';
     row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 220), behavior: 'smooth' });
   }
 
-  // 4. Primary Category Drilldown View (FIXED GRID OVERFLOW & STRETCHING)
+  // 4. Primary Category Drilldown View
   async function showCategoryProducts(categoryId, categoryName) {
     const categoriesSection = document.getElementById('categories');
     const collectionsSection = document.getElementById('collections-section');
@@ -284,10 +284,11 @@ import { supabase } from './supabaseClient.js';
 
     if (categoryTitle) categoryTitle.textContent = categoryName;
 
+    // UPDATED SKELETON: aspect-square
     if (productGrid) {
       productGrid.innerHTML = Array(6).fill(`
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
-            <div class="w-full aspect-[4/5] bg-gray-200 rounded-t-[1.5rem] md:rounded-t-[2rem]"></div>
+            <div class="w-full aspect-square bg-gray-100 rounded-t-[1.5rem] md:rounded-t-[2rem]"></div>
             <div class="p-4 md:p-5 flex flex-col flex-grow border-t border-gray-50 bg-white">
                 <div class="flex justify-between items-start mb-1 gap-2">
                     <div class="h-5 bg-gray-200 rounded w-2/3"></div>
@@ -374,11 +375,14 @@ import { supabase } from './supabaseClient.js';
 
           return `
             <div onclick="openProductModal('${prod.id}')" class="product-card min-w-0 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden cursor-pointer">
-                <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[1.5rem] md:rounded-t-[2rem]">
+                
+                <!-- UPDATED: aspect-square so horizontal and vertical photos align perfectly without popping the grid -->
+                <div class="relative w-full aspect-square bg-[#FDFBF7] overflow-hidden group/slider rounded-t-[1.5rem] md:rounded-t-[2rem]">
                     <div id="slider-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, '${prod.id}')">
                         ${imagesArr.map((img) => `
-                            <div class="min-w-full h-full flex-none snap-center flex items-center justify-center p-2 md:p-4">
-                                <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain transition-transform duration-500 group-hover/slider:scale-105">
+                            <!-- UPDATED: max-w-full max-h-full explicitly prevents images from stretching the box -->
+                            <div class="min-w-full h-full flex-none snap-center flex items-center justify-center p-3 md:p-6">
+                                <img src="${img}" alt="${prod.title}" class="max-w-full max-h-full object-contain transition-transform duration-500 group-hover/slider:scale-105">
                             </div>
                         `).join('')}
                     </div>
@@ -394,7 +398,7 @@ import { supabase } from './supabaseClient.js';
                     ` : ''}
                 </div>
 
-                <div class="p-3 md:p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
+                <div class="p-4 md:p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
                     <h3 class="font-semibold text-gray-900 group-hover:text-pink-500 transition-colors text-sm md:text-lg line-clamp-2 leading-tight z-10 mb-1 break-words">
                         ${prod.title}
                     </h3>
@@ -713,7 +717,7 @@ import { supabase } from './supabaseClient.js';
     }
   }
 
-  // 9. Cutest Pepes Showcase (FIXED GRID OVERFLOW & STRETCHING)
+  // 9. Cutest Pepes Showcase (FIXED IMAGE SIZING)
   async function loadCutestPepesShowcase() {
     const track = document.getElementById('cutest-pepes-track');
     if (!track) return;
@@ -767,11 +771,14 @@ import { supabase } from './supabaseClient.js';
 
         return `
           <div onclick="openProductModal('${prod.id}')" class="product-card min-w-0 w-64 md:w-72 flex-shrink-0 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative group overflow-hidden cursor-pointer">
-              <div class="relative w-full aspect-[4/5] bg-white overflow-hidden group/slider rounded-t-[1.5rem] md:rounded-t-[2rem]">
+              
+              <!-- UPDATED: aspect-square -->
+              <div class="relative w-full aspect-square bg-[#FDFBF7] overflow-hidden group/slider rounded-t-[1.5rem] md:rounded-t-[2rem]">
                   <div id="slider-promo-${prod.id}" class="flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory h-full w-full no-scrollbar relative z-10 touch-pan-x" onscroll="updateSliderDots(event, 'promo-${prod.id}')">
                       ${imagesArr.map((img) => `
-                          <div class="min-w-full h-full flex-none snap-center flex items-center justify-center p-2 md:p-4">
-                              <img src="${img}" alt="${prod.title}" class="w-full h-full object-contain transition-transform duration-500 group-hover/slider:scale-105">
+                          <!-- UPDATED: max-w-full max-h-full explicitly prevents images from stretching the box -->
+                          <div class="min-w-full h-full flex-none snap-center flex items-center justify-center p-3 md:p-6">
+                              <img src="${img}" alt="${prod.title}" class="max-w-full max-h-full object-contain transition-transform duration-500 group-hover/slider:scale-105">
                           </div>
                       `).join('')}
                   </div>
@@ -787,7 +794,7 @@ import { supabase } from './supabaseClient.js';
                   ` : ''}
               </div>
 
-              <div class="p-3 md:p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
+              <div class="p-4 md:p-5 flex flex-col flex-grow border-t border-gray-50 relative z-20 bg-white">
                   <h3 class="font-semibold text-gray-900 group-hover:text-pink-500 transition-colors text-sm md:text-lg line-clamp-2 leading-tight z-10 mb-1 break-words">
                       ${prod.title}
                   </h3>
