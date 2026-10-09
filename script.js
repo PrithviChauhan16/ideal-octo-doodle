@@ -258,14 +258,21 @@ import { supabase } from './supabaseClient.js';
     updateRowArrows(row);
   }
 
-  function updateRowArrows(row) {
+function updateRowArrows(row) {
     const wrap = row.parentElement;
     if (!wrap) return;
     const left = wrap.querySelector('[data-arrow="left"]');
     const right = wrap.querySelector('[data-arrow="right"]');
     const max = row.scrollWidth - row.clientWidth - 2;
-    if (left) left.classList.toggle('md:flex', row.scrollLeft > 2);
-    if (right) right.classList.toggle('md:flex', row.scrollLeft < max);
+    
+    if (left) {
+        left.classList.toggle('hidden', row.scrollLeft <= 2);
+        left.classList.toggle('flex', row.scrollLeft > 2);
+    }
+    if (right) {
+        right.classList.toggle('hidden', row.scrollLeft >= max);
+        right.classList.toggle('flex', row.scrollLeft < max);
+    }
   }
 
   function scrollCategoryRow(containerId, direction) {
