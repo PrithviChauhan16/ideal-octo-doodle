@@ -150,23 +150,21 @@
                 <img id="banner-slider" src="banner.png" class="w-full h-auto object-contain transition-opacity duration-500 shadow-lg rounded-[2rem] md:rounded-[3rem]"
                     alt="Pepe Kun Banner">
             </header>
-<!-- PREMIUM TRUST BANNER (INTERACTIVE FLIP CARDS) -->
+<!-- PREMIUM TRUST BANNER (INTERACTIVE FLIP CARDS WITH PHOTOS) -->
 <section class="py-12 bg-white/50 backdrop-blur-sm border-y border-pink-50/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
         
-        <!-- Card 1: Cotton (With Photo Example) -->
+        <!-- Card 1: Cotton -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
-            <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer overflow-hidden">
-                <!-- Front -->
-                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                    
-                    <!-- To use your own photo, uncomment the image below and delete the emoji -->
-                    <!-- <img src="your-photo.png" alt="Ultra Soft" class="absolute inset-0 w-full h-full object-cover opacity-30 z-0"> -->
-                    
-                    <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110 relative z-10">☁️</span>
-                    <h4 class="text-xs md:text-sm font-bold text-gray-900 tracking-wide uppercase relative z-10">Ultra-Soft</h4>
+            <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
+                <!-- Front (Photo) -->
+                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-end justify-center pb-4">
+                    <!-- YOUR PHOTO HERE -->
+                    <img src="1.png" alt="Ultra-Soft" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+                    <h4 class="text-xs md:text-sm font-bold text-white tracking-wide uppercase relative z-20">Ultra-Soft</h4>
                 </div>
-                <!-- Back -->
+                <!-- Back (Details) -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl bg-gradient-to-br from-pink-400 to-pink-500 text-white [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center p-4 shadow-lg border border-pink-400">
                     <h4 class="text-[13px] font-bold tracking-wide uppercase mb-1.5">Ultra-Soft Cotton</h4>
                     <p class="text-xs text-white/90 leading-relaxed px-2">Premium hypoallergenic fill for cloud-like hugs.</p>
@@ -177,12 +175,14 @@
         <!-- Card 2: Washable -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
             <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
-                <!-- Front -->
-                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                    <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110">🧼</span>
-                    <h4 class="text-xs md:text-sm font-bold text-gray-900 tracking-wide uppercase">Washable</h4>
+                <!-- Front (Photo) -->
+                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-end justify-center pb-4">
+                    <!-- YOUR PHOTO HERE -->
+                    <img src="4.png" alt="Washable" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+                    <h4 class="text-xs md:text-sm font-bold text-white tracking-wide uppercase relative z-20">Washable</h4>
                 </div>
-                <!-- Back -->
+                <!-- Back (Details) -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl bg-gradient-to-br from-pink-400 to-pink-500 text-white [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center p-4 shadow-lg border border-pink-400">
                     <h4 class="text-[13px] font-bold tracking-wide uppercase mb-1.5">Machine Washable</h4>
                     <p class="text-xs text-white/90 leading-relaxed px-2">Easy care for long-lasting, squeaky-clean companions.</p>
@@ -193,12 +193,14 @@
         <!-- Card 3: Hand-Finished -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
             <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
-                <!-- Front -->
-                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                    <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110">✨</span>
-                    <h4 class="text-xs md:text-sm font-bold text-gray-900 tracking-wide uppercase">Handcrafted</h4>
+                <!-- Front (Photo) -->
+                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-end justify-center pb-4">
+                    <!-- YOUR PHOTO HERE -->
+                    <img src="7.png" alt="Handcrafted" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+                    <h4 class="text-xs md:text-sm font-bold text-white tracking-wide uppercase relative z-20">Handcrafted</h4>
                 </div>
-                <!-- Back -->
+                <!-- Back (Details) -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl bg-gradient-to-br from-pink-400 to-pink-500 text-white [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center p-4 shadow-lg border border-pink-400">
                     <h4 class="text-[13px] font-bold tracking-wide uppercase mb-1.5">Hand-Finished</h4>
                     <p class="text-xs text-white/90 leading-relaxed px-2">Stitched with love, precision, and strict quality checks.</p>
@@ -206,25 +208,26 @@
             </div>
         </div>
 
-        <!-- Card 4: Secure Checkout -->
+        <!-- Card 4: Skin-Safe -->
         <div class="group h-36 md:h-40 w-full [perspective:1000px]">
             <div class="trust-card relative h-full w-full rounded-2xl shadow-sm transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] cursor-pointer">
-                <!-- Front -->
-                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 flex flex-col justify-center items-center p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                    <span class="text-3xl md:text-4xl mb-2 block transition-transform group-hover:scale-110">🔒</span>
-                    <h4 class="text-xs md:text-sm font-bold text-gray-900 tracking-wide uppercase">Secure</h4>
+                <!-- Front (Photo) -->
+                <div class="absolute inset-0 h-full w-full rounded-2xl [backface-visibility:hidden] bg-white border border-pink-100 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-end justify-center pb-4">
+                    <!-- YOUR PHOTO HERE -->
+                    <img src="11.png" alt="Skin-Safe" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+                    <h4 class="text-xs md:text-sm font-bold text-white tracking-wide uppercase relative z-20">Skin-Safe</h4>
                 </div>
-                <!-- Back -->
+                <!-- Back (Details) -->
                 <div class="absolute inset-0 h-full w-full rounded-2xl bg-gradient-to-br from-pink-400 to-pink-500 text-white [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center p-4 shadow-lg border border-pink-400">
-                    <h4 class="text-[13px] font-bold tracking-wide uppercase mb-1.5">Secure Checkout</h4>
-                    <p class="text-xs text-white/90 leading-relaxed px-2">100% encrypted payments for your peace of mind.</p>
+                    <h4 class="text-[13px] font-bold tracking-wide uppercase mb-1.5">Hypoallergenic</h4>
+                    <p class="text-xs text-white/90 leading-relaxed px-2">Eco-friendly materials that are 100% gentle on sensitive skin.</p>
                 </div>
             </div>
         </div>
 
     </div>
 </section>
-
             <!-- MAIN CATEGORIES -->
             <section id="categories" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16 transition-all duration-500">
                 <div class="text-center mb-8">
